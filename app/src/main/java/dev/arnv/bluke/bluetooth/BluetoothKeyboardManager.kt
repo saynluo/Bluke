@@ -66,6 +66,14 @@ class BluetoothKeyboardManager(private val context: Context) {
 
     private val reportDiagnostics = HidReportDiagnostics()
 
+    val lanServer = LanHidServer()
+
+    /** Sends to the LAN receiver (if any) and the Bluetooth host (if any). */
+    private fun dispatchReport(dev: BluetoothDevice?, reportId: Int, report: ByteArray) {
+        lanServer.send(reportId, report)
+        if (dev != null) submitReport(dev, reportId, report)
+    }
+
     private fun logHidEvent(event: String) {
         if (!DeveloperLogManager.isEnabled) return
         val message = "t=${android.os.SystemClock.elapsedRealtime()} thread=${Thread.currentThread().name} " +
@@ -1645,23 +1653,12 @@ class BluetoothKeyboardManager(private val context: Context) {
             }
         }
 
-        // Transmit HID report
-        if (dev != null) {
-            submitReport(dev, reportId, report)
-        }
+        dispatchReport(dev, reportId, report)
     }
 
     @SuppressLint("MissingPermission")
     fun sendMouseReport(buttons: Byte, x: Byte, y: Byte, wheel: Byte) {
-        val dev = _connectedDevice.value
-        if (dev != null) {
-            val report = ByteArray(4)
-            report[0] = buttons
-            report[1] = x
-            report[2] = y
-            report[3] = wheel
-            submitReport(dev, 2, report) // Mouse report ID is 2
-        }
+        dispatchReport(_connectedDevice.value, 2, byteArrayOf(buttons, x, y, wheel)) // Mouse report ID is 2
     }
 
     @SuppressLint("MissingPermission")
@@ -1706,8 +1703,7 @@ class BluetoothKeyboardManager(private val context: Context) {
     fun releaseAllInputs() {
         connectionEpoch.incrementAndGet() // Discard held-input reports that have not been sent yet.
         resetKeyboardState()
-        val device = _connectedDevice.value ?: return
-        submitReport(device, reportId, ByteArray(8))
+        dispatchReport(_connectedDevice.value, reportId, ByteArray(8))
         sendMouseReport(0, 0, 0, 0)
         sendGamepadReport(0, 0, 0f, 0f, 0f, 0f)
         sendConsumerControl(null)
@@ -1814,6 +1810,7 @@ class BluetoothKeyboardManager(private val context: Context) {
         managerJob.cancel()
         executor.shutdownNow()
         reportExecutor.shutdownNow()
+        lanServer.close()
     }
 
     @SuppressLint("MissingPermission")
@@ -1823,9 +1820,6 @@ class BluetoothKeyboardManager(private val context: Context) {
 
     @SuppressLint("MissingPermission")
     fun sendConsumerControl(control: ConsumerControl?) {
-        val dev = _connectedDevice.value
-        if (dev != null) {
-            submitReport(dev, 4, buildConsumerControlReport(control))
-        }
+        dispatchReport(_connectedDevice.value, 4, buildConsumerControlReport(control))
     }
 }

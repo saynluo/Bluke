@@ -1195,6 +1195,17 @@ fun HomeScreen(
                                 )
                             }
 
+                            item {
+                                val lanState by btManager.lanServer.state.collectAsStateWithLifecycle()
+                                LanConnectionCard(
+                                    state = lanState,
+                                    onToggle = { on ->
+                                        // ServerSocket bind must stay off the main thread.
+                                        Thread { if (on) btManager.lanServer.start() else btManager.lanServer.stop() }.start()
+                                    }
+                                )
+                            }
+
                             if (showTroubleshootingNudge) {
                                 item {
                                     TroubleshootingNudgeCard(

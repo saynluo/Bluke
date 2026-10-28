@@ -23,6 +23,15 @@ Bluke communicates directly with your host device (PC, laptop, tablet, or phone)
 > **Connecting to a Linux Computer (Ubuntu, Fedora, Arch, etc.)?**
 > If your Linux desktop doesn't show the pairing or PIN confirmation popup when connecting from Bluke, use the [Host-Initiated Workaround](#linux-pairing-prompt-does-not-appear-on-the-computer): tap Scan in Bluke once (which makes your phone visible to Linux), then initiate pairing **from your Linux Bluetooth settings**.
 
+### Connecting over LAN (Wi-Fi)
+
+When Bluetooth is inconvenient, the phone and computer can talk over the same local network instead. This needs a small receiver script on the computer.
+
+1. Turn on **LAN Connection** on Bluke's home screen. It shows the phone's address and a 6-digit PIN (new every time it is turned on).
+2. On the computer: `pip install pynput`, then run `python tools/bluke_lan_receiver.py <phone-ip> <pin>`.
+
+Keyboard, touchpad and media keys work over LAN; gamepad mode and Caps/Num Lock LED sync are Bluetooth-only. Traffic is unencrypted, so only use it on a network you trust.
+
 ---
 
 ## 2. Core Interface: The Unified App Bar
