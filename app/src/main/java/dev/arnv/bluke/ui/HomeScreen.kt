@@ -1,4 +1,5 @@
 package dev.arnv.bluke.ui
+import androidx.compose.ui.res.stringArrayResource
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
@@ -65,6 +66,7 @@ import dev.arnv.bluke.bluetooth.BluetoothState
 import dev.arnv.bluke.bluetooth.ConsumerControl
 import dev.arnv.bluke.bluetooth.CURRENT_HID_DESCRIPTOR_REVISION
 import dev.arnv.bluke.bluetooth.HID_DESCRIPTOR_REVISION_PREFERENCE
+import dev.arnv.bluke.bluetooth.LanHidLink
 import dev.arnv.bluke.bluetooth.requiresHidDescriptorRefresh
 import dev.arnv.bluke.sound.KeyboardSoundSynthesizer
 import dev.arnv.bluke.sound.SwitchType
@@ -267,21 +269,13 @@ fun HomeScreen(
             },
             title = {
                 Text(
-                    if (descriptorRefreshRequired) "Bluetooth pairing refresh required"
-                    else "Updated to v$versionName"
+                    if (descriptorRefreshRequired) stringResource(R.string.update_refresh_title)
+                    else stringResource(R.string.update_title, versionName)
                 )
             },
             text = {
                 Text(
-                    if (descriptorRefreshRequired) {
-                        "Bluke now uses one shared HID descriptor for Native, Android and Web, " +
-                            "but Bluetooth hosts cache the old layout. To use the new controls, forget the host on this phone, " +
-                            "remove Bluke on the host, then pair again once. Reinstalling the app alone is not enough. " +
-                            "After this one-time refresh, all controller modes switch live without reconnecting or re-pairing."
-                    } else {
-                        "We've added new features and made significant underlying changes to the controller!\n" +
-                            "For detailed information, see the changelog."
-                    }
+                    stringResource(if (descriptorRefreshRequired) R.string.update_refresh_body else R.string.update_body)
                 )
             },
             confirmButton = {
@@ -295,14 +289,14 @@ fun HomeScreen(
                     }
                     descriptorRefreshRequired = false
                 }) {
-                    Text("Got it")
+                    Text(stringResource(R.string.action_got_it))
                 }
             },
             dismissButton = {
                 androidx.compose.material3.TextButton(onClick = { 
                     uriHandler.openUri("https://github.com/arnav-kr/Bluke/releases")
                 }) {
-                    Text("Changelog")
+                    Text(stringResource(R.string.action_changelog))
                 }
             }
         )
@@ -310,6 +304,15 @@ fun HomeScreen(
 
     // Connection helper declared at outer scope
     val isConnected = btState is BluetoothState.Connected
+    val lanState by btManager.lanLink.state.collectAsStateWithLifecycle()
+    val lanHosts by btManager.lanLink.hosts.collectAsStateWithLifecycle()
+    val lanScanning by btManager.lanLink.isScanning.collectAsStateWithLifecycle()
+    val lanFailure by btManager.lanLink.lastFailure.collectAsStateWithLifecycle()
+    val lanHost = (lanState as? LanHidLink.State.Connected)?.host
+    var connectionMode by remember {
+        mutableStateOf(ConnectionMode.fromPreference(sharedPrefs.getString(ConnectionMode.PREFERENCE, null)))
+    }
+    var pinDialogHost by remember { mutableStateOf<LanHidLink.Host?>(null) }
     val offerSettingsPairingHelp = shouldOfferSettingsPairingHelp(btState, homeUiState.hidLifecycleState)
 
     LaunchedEffect(offerSettingsPairingHelp) {
@@ -339,10 +342,9 @@ fun HomeScreen(
         }
     }
 
+    val attemptKeywords = stringArrayResource(R.array.status_attempt_keywords)
     LaunchedEffect(btMessage, isConnected) {
-        val attemptInProgress = btMessage.contains("connecting", ignoreCase = true) ||
-            btMessage.contains("pairing", ignoreCase = true) ||
-            btMessage.contains("switching", ignoreCase = true)
+        val attemptInProgress = attemptKeywords.any { btMessage.contains(it, ignoreCase = true) }
         if (!isConnected && attemptInProgress) {
             kotlinx.coroutines.delay(CONNECTION_HELP_STALL_MILLIS)
             if (shouldOfferConnectionHelp(stalledForMillis = CONNECTION_HELP_STALL_MILLIS)) {
@@ -359,12 +361,12 @@ fun HomeScreen(
                 sharedPrefs.edit { putBoolean("mock_gamepad_guide", false) }
             },
             icon = { Icon(Icons.Default.SportsEsports, contentDescription = null) },
-            title = { Text("Before using the gamepad") },
+            title = { Text(stringResource(R.string.gamepad_guide_title)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Text("Choose Native for Windows/Linux games, Android for games on Android, or Web when a browser game ignores directions. Tap the controller mode button to switch; hold it to open settings.")
-                    Text("On Windows, some newer games accept only Xbox XInput controllers. Bluke is a standard Bluetooth HID gamepad, so Steam Input or another compatibility layer may be needed.")
-                    Text("If the host cached an older Bluke controller layout, forget Bluke on both devices and pair again once.")
+                    Text(stringResource(R.string.gamepad_guide_modes))
+                    Text(stringResource(R.string.gamepad_guide_xinput))
+                    Text(stringResource(R.string.gamepad_guide_cache))
                 }
             },
             confirmButton = {
@@ -380,14 +382,14 @@ fun HomeScreen(
                         pendingGamepadMode = null
                         isKeyboardActive = true
                     },
-                ) { Text("Open gamepad") }
+                ) { Text(stringResource(R.string.action_open_gamepad)) }
             },
             dismissButton = {
                 TextButton(onClick = {
                     showGamepadGuide = false
                     pendingGamepadMode = null
                     sharedPrefs.edit { putBoolean("mock_gamepad_guide", false) }
-                }) { Text("Not now") }
+                }) { Text(stringResource(R.string.action_not_now)) }
             },
         )
     }
@@ -666,7 +668,7 @@ fun HomeScreen(
                                         switchInputMode(newMode)
                                     },
                                     sharedPrefs = sharedPrefs,
-                                    isConnected = isConnected,
+                                    isConnected = isConnected || lanHost != null,
                                 )
                             }
                         }
@@ -710,13 +712,13 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Close,
-                                        contentDescription = "Exit",
+                                        contentDescription = stringResource(R.string.cd_exit),
                                         tint = Color.White,
                                         modifier = Modifier.size(10.dp)
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "Close",
+                                        text = stringResource(R.string.action_close),
                                         color = Color.White,
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold
@@ -730,8 +732,8 @@ fun HomeScreen(
                                         .clip(RoundedCornerShape(6.dp))
                                         .background(Color.White.copy(alpha = 0.15f))
                                         .combinedClickable(
-                                            onClickLabel = "Next input mode",
-                                            onLongClickLabel = "Configure input mode cycle",
+                                            onClickLabel = stringResource(R.string.cd_next_input_mode),
+                                            onLongClickLabel = stringResource(R.string.cd_configure_input_cycle),
                                             onClick = {
                                                 val enabledModes = sharedPrefs.enabledInputModes().map(InputMode::id)
                                                 val currentIndexInEnabled = enabledModes.indexOf(launchMode)
@@ -753,12 +755,12 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Keyboard,
-                                        contentDescription = "Switch Mode",
+                                        contentDescription = stringResource(R.string.cd_switch_mode),
                                         tint = Color.White,
                                         modifier = Modifier.size(11.dp)
                                     )
                                     Text(
-                                        text = "Keyboard Mode",
+                                        text = stringResource(R.string.keyboard_mode),
                                         color = Color.White,
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold
@@ -766,10 +768,10 @@ fun HomeScreen(
                                 }
 
                                 // Status LED and connection details
-                                val statusLedColor = if (isConnected) Color(0xFF39FF14) else Color(0xFFFF9800)
+                                val statusLedColor = if (isConnected || lanHost != null) Color(0xFF39FF14) else Color(0xFFFF9800)
                                 // Use collected state (not .value) so UI reacts to changes from background
                                 val activeDevice = homeUiState.connectedDevice ?: lastConnectedDevice ?: btManager.getReconnectTarget()
-                                val deviceName = activeDevice?.name ?: "No Host"
+                                val deviceName = (if (isConnected) null else lanHost?.name) ?: activeDevice?.name ?: stringResource(R.string.no_host)
                                 
                                 Box(
                                     modifier = Modifier
@@ -924,8 +926,8 @@ fun HomeScreen(
                                         .clip(RoundedCornerShape(6.dp))
                                         .background(Color.White.copy(alpha = 0.15f))
                                         .combinedClickable(
-                                            onClickLabel = "Next keyboard layout",
-                                            onLongClickLabel = "Configure keyboard layout cycle",
+                                            onClickLabel = stringResource(R.string.cd_next_layout),
+                                            onLongClickLabel = stringResource(R.string.cd_configure_layout_cycle),
                                             onClick = {
                                                 val savedSet = sharedPrefs.getStringSet(CYCLE_KEYBOARD_GEOMETRIES_PREFERENCE, null)
                                                 val enabledLayouts = if (savedSet == null) {
@@ -948,7 +950,7 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Keyboard,
-                                        contentDescription = "Layout",
+                                        contentDescription = stringResource(R.string.cd_layout),
                                         tint = Color.White.copy(alpha = 0.9f),
                                         modifier = Modifier.size(10.dp)
                                     )
@@ -971,8 +973,8 @@ fun HomeScreen(
                                         .clip(RoundedCornerShape(6.dp))
                                         .background(Color.White.copy(alpha = 0.15f))
                                         .combinedClickable(
-                                            onClickLabel = "Next key sound",
-                                            onLongClickLabel = "Manage key sounds",
+                                            onClickLabel = stringResource(R.string.cd_next_sound),
+                                            onLongClickLabel = stringResource(R.string.cd_manage_sounds),
                                             onClick = {
                                                 val enabledProfiles = soundCycleSelection(
                                                     sharedPrefs,
@@ -992,7 +994,7 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.MusicNote,
-                                        contentDescription = "Switch",
+                                        contentDescription = stringResource(R.string.cd_switch_sound),
                                         tint = Color.White.copy(alpha = 0.9f),
                                         modifier = Modifier.size(10.dp)
                                     )
@@ -1012,8 +1014,8 @@ fun HomeScreen(
                                         .clip(RoundedCornerShape(6.dp))
                                         .background(Color.White.copy(alpha = 0.15f))
                                         .combinedClickable(
-                                            onClickLabel = "Next keyboard theme",
-                                            onLongClickLabel = "Customize keyboard themes",
+                                            onClickLabel = stringResource(R.string.cd_next_theme),
+                                            onLongClickLabel = stringResource(R.string.cd_customize_themes),
                                             onClick = {
                                                 val availableThemes = keyboardThemeRepository.allThemes()
                                                 val savedThemeIds = sharedPrefs.getStringSet(
@@ -1082,7 +1084,7 @@ fun HomeScreen(
                                 ) {
                                     Icon(
                                         imageVector = if (isMuted) Icons.AutoMirrored.Filled.VolumeOff else Icons.AutoMirrored.Filled.VolumeUp,
-                                        contentDescription = "Mute",
+                                        contentDescription = stringResource(R.string.cd_mute),
                                         tint = Color.White,
                                         modifier = Modifier.size(14.dp)
                                     )
@@ -1135,7 +1137,7 @@ fun HomeScreen(
                                     modifier = Modifier.clickable {
                                         easterEggClicks++
                                         if (easterEggClicks < 5) {
-                                            android.widget.Toast.makeText(context, "${5 - easterEggClicks} more clicks to activate", android.widget.Toast.LENGTH_SHORT).show()
+                                            android.widget.Toast.makeText(context, context.getString(R.string.easter_egg_clicks_left, 5 - easterEggClicks), android.widget.Toast.LENGTH_SHORT).show()
                                         } else {
                                             easterEggClicks = 0
                                             val intent = Intent(Intent.ACTION_VIEW, "https://www.youtube.com/watch?v=dQw4w9WgXcQ".toUri())
@@ -1149,7 +1151,7 @@ fun HomeScreen(
                             IconButton(onClick = { 
                                 context.startActivity(Intent(context, dev.arnv.bluke.SettingsActivity::class.java))
                             }) {
-                                Icon(Icons.Default.Settings, contentDescription = "Settings")
+                                Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings_title))
                             }
                         }
                     )
@@ -1162,47 +1164,67 @@ fun HomeScreen(
                         .padding(top = innerPadding.calculateTopPadding())
                         .background(MaterialTheme.colorScheme.background)
                 ) {
-                    if (btState.blocksInputLaunch()) {
-                        ProfileNotSupportedScreen(
-                            bluetoothState = btState,
-                            onEnableBluetooth = {
-                                btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
-                            },
-                            onRetry = btManager::retryBluetoothCapabilities
-                        )
-                    } else {
-                        var isPairedExpanded by rememberSaveable { mutableStateOf(true) }
-                        var isDiscoveredExpanded by rememberSaveable { mutableStateOf(true) }
-                        val connectedDeviceState = homeUiState.connectedDevice
+                    var isPairedExpanded by rememberSaveable { mutableStateOf(true) }
+                    var isDiscoveredExpanded by rememberSaveable { mutableStateOf(true) }
+                    val connectedDeviceState = homeUiState.connectedDevice
 
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .navigationBarsPadding(),
-                            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 100.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            // Unified Top Scan & Status Card
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .navigationBarsPadding(),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 120.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        item {
+                            ConnectionModeTabs(
+                                selected = connectionMode,
+                                onSelect = { mode ->
+                                    connectionMode = mode
+                                    sharedPrefs.edit { putString(ConnectionMode.PREFERENCE, mode.preferenceValue) }
+                                    if (mode == ConnectionMode.LAN && lanHosts.isEmpty()) btManager.lanLink.scan()
+                                }
+                            )
+                        }
+
+                        if (connectionMode == ConnectionMode.LAN) {
+                            LanSection(
+                                state = lanState,
+                                hosts = lanHosts,
+                                isScanning = lanScanning,
+                                lastFailure = lanFailure,
+                                onScan = btManager.lanLink::scan,
+                                onPickHost = { host ->
+                                    btManager.lanLink.clearFailure()
+                                    pinDialogHost = host
+                                },
+                                onDisconnect = btManager.lanLink::disconnect,
+                            )
+                        } else if (btState.blocksInputLaunch()) {
+                            item {
+                                ProfileNotSupportedScreen(
+                                    bluetoothState = btState,
+                                    onEnableBluetooth = {
+                                        btLauncher.launch(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+                                    },
+                                    onRetry = btManager::retryBluetoothCapabilities,
+                                    onUseLan = {
+                                        connectionMode = ConnectionMode.LAN
+                                        sharedPrefs.edit { putString(ConnectionMode.PREFERENCE, ConnectionMode.LAN.preferenceValue) }
+                                        btManager.lanLink.scan()
+                                    }
+                                )
+                            }
+                        } else {
                             item {
                                 StatusHeaderCard(
                                     bluetoothState = btState,
                                     hidLifecycleState = homeUiState.hidLifecycleState,
+                                    connectedHostName = connectedDeviceState?.name,
                                     isScanning = isScanning,
                                     onToggleScan = {
                                         if (isScanning) btManager.stopScanning() else btManager.startScanning()
                                     },
                                     onRestartHid = btManager::restartHidService
-                                )
-                            }
-
-                            item {
-                                val lanState by btManager.lanServer.state.collectAsStateWithLifecycle()
-                                LanConnectionCard(
-                                    state = lanState,
-                                    onToggle = { on ->
-                                        // ServerSocket bind must stay off the main thread.
-                                        Thread { if (on) btManager.lanServer.start() else btManager.lanServer.stop() }.start()
-                                    }
                                 )
                             }
 
@@ -1249,8 +1271,20 @@ fun HomeScreen(
                         }
                     }
 
+                    pinDialogHost?.let { host ->
+                        LanPinDialog(
+                            host = host,
+                            initialPin = btManager.lanLink.savedPin(host).orEmpty(),
+                            onConfirm = { pin ->
+                                pinDialogHost = null
+                                btManager.lanLink.connect(host, pin)
+                            },
+                            onDismiss = { pinDialogHost = null }
+                        )
+                    }
+
                     // Sticky Launch Button
-                    if (!btState.blocksInputLaunch()) Box(
+                    if (!btState.blocksInputLaunch() || lanState is LanHidLink.State.Connected) Box(
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
@@ -1293,7 +1327,7 @@ fun HomeScreen(
                                 }
                                 Icon(
                                     imageVector = modeIcon,
-                                    contentDescription = "Cycle Input Mode",
+                                    contentDescription = stringResource(R.string.cd_cycle_input_mode),
                                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                                     modifier = Modifier.size(26.dp)
                                 )
@@ -1318,14 +1352,14 @@ fun HomeScreen(
                                 )
                             ) {
                                 val launchText = when (launchMode) {
-                                    1 -> "Launch Touchpad"
-                                    2 -> "Launch Gamepad"
-                                    4 -> "Launch Multimedia"
-                                    else -> "Launch Keyboard"
+                                    1 -> stringResource(R.string.launch_touchpad)
+                                    2 -> stringResource(R.string.launch_gamepad)
+                                    4 -> stringResource(R.string.launch_multimedia)
+                                    else -> stringResource(R.string.launch_keyboard)
                                 }
                                 Icon(
                                     imageVector = Icons.Default.KeyboardArrowUp,
-                                    contentDescription = "Launch Icon",
+                                    contentDescription = stringResource(R.string.cd_launch),
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
@@ -1367,25 +1401,25 @@ private fun TroubleshootingNudgeCard(
         ) {
             Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = null)
             Column(modifier = Modifier.weight(1f)) {
-                Text("Having trouble connecting?", style = MaterialTheme.typography.titleMedium)
+                Text(stringResource(R.string.nudge_title), style = MaterialTheme.typography.titleMedium)
                 Text(
                     if (offerSettingsPairingHelp) {
-                        "If you paired through Bluetooth settings, forget the pairing on both devices, then use Scan in Bluke to pair and connect again."
+                        stringResource(R.string.nudge_settings_pairing)
                     } else {
-                        "Check both pairing prompts or follow the safe repair steps. A slow attempt does not automatically mean this phone is incompatible."
+                        stringResource(R.string.nudge_generic)
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                 )
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     if (offerSettingsPairingHelp) {
-                        TextButton(onClick = onScan) { Text("Scan") }
+                        TextButton(onClick = onScan) { Text(stringResource(R.string.action_scan)) }
                     }
-                    TextButton(onClick = onOpenHelp) { Text("Help") }
+                    TextButton(onClick = onOpenHelp) { Text(stringResource(R.string.action_help)) }
                 }
             }
             IconButton(onClick = onDismiss) {
-                Icon(Icons.Default.Close, contentDescription = "Dismiss")
+                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.cd_dismiss))
             }
         }
     }

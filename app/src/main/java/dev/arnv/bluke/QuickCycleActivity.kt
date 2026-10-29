@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,8 +39,8 @@ class QuickCycleActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Input mode cycle") },
-                            navigationIcon = { IconButton(onClick = ::finish) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                            title = { Text(stringResource(R.string.input_cycle_title)) },
+                            navigationIcon = { IconButton(onClick = ::finish) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.cd_back)) } },
                             scrollBehavior = scrollBehavior,
                         )
                     },
@@ -49,16 +50,16 @@ class QuickCycleActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         Text(
-                            "Toolbar taps only visit checked input modes. Configure layout, theme, and sound cycles in their own Keyboard settings lists.",
+                            stringResource(R.string.input_cycle_explanation),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
                         )
                         SettingsCardGroup(
-                            title = "Input modes",
+                            title = stringResource(R.string.input_modes),
                             items = InputMode.entries.map { mode ->
                                 SettingsItemData(
-                                    title = mode.displayName,
+                                    title = stringResource(mode.labelRes),
                                     icon = { Icon(Icons.Default.SportsEsports, null, tint = MaterialTheme.colorScheme.primary) },
                                     action = {
                                         Checkbox(

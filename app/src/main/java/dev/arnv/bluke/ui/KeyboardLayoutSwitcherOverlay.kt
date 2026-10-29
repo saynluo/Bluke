@@ -1,5 +1,7 @@
 package dev.arnv.bluke.ui
 
+import androidx.compose.ui.res.stringResource
+import dev.arnv.bluke.R
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -45,7 +47,7 @@ internal fun KeyboardLayoutSwitcherOverlay(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 Text(
-                    text = "Typing layout",
+                    text = stringResource(R.string.typing_layout),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.SemiBold,
                 )
@@ -72,7 +74,7 @@ internal fun KeyboardLayoutSwitcherOverlay(
                     }
                 }
                 Text(
-                    text = "Host input source: ${selectedLayout.hostLayoutName}",
+                    text = stringResource(R.string.host_input_source, stringResource(selectedLayout.hostLayoutRes)),
                     fontSize = 9.sp,
                     color = MaterialTheme.colorScheme.inverseOnSurface.copy(alpha = 0.72f),
                 )

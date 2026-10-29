@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -122,7 +123,7 @@ class KeyboardThemesActivity : ComponentActivity() {
                 fun beginCopy(source: KeyboardThemeDefinition) {
                     editingTheme = source.copy(
                         id = "$CUSTOM_KEYBOARD_THEME_PREFIX${UUID.randomUUID()}",
-                        name = "${source.name} copy",
+                        name = getString(R.string.theme_copy_name, source.name),
                         editable = true,
                     )
                 }
@@ -132,12 +133,12 @@ class KeyboardThemesActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text(if (editingTheme == null) "Keyboard themes" else "Edit keyboard theme") },
+                            title = { Text(if (editingTheme == null) stringResource(R.string.keyboard_themes_title) else stringResource(R.string.edit_keyboard_theme)) },
                             navigationIcon = {
                                 IconButton(onClick = {
                                     if (editingTheme == null) finish() else editingTheme = null
                                 }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                 }
                             },
                             scrollBehavior = scrollBehavior,
@@ -197,8 +198,8 @@ class KeyboardThemesActivity : ComponentActivity() {
                 pendingDelete?.let { themeToDelete ->
                     AlertDialog(
                         onDismissRequest = { pendingDelete = null },
-                        title = { Text("Delete ${themeToDelete.name}?") },
-                        text = { Text("This removes the custom keyboard theme. Built-in themes are not affected.") },
+                        title = { Text(stringResource(R.string.theme_delete_title, themeToDelete.name)) },
+                        text = { Text(stringResource(R.string.theme_delete_body)) },
                         confirmButton = {
                             TextButton(onClick = {
                                 repository.delete(themeToDelete.id)
@@ -211,10 +212,10 @@ class KeyboardThemesActivity : ComponentActivity() {
                                 repository.selectTheme(nextSelected)
                                 preferences.edit { putStringSet(CYCLE_KEYBOARD_THEMES_PREFERENCE, nextCycle) }
                                 pendingDelete = null
-                            }) { Text("Delete") }
+                            }) { Text(stringResource(R.string.action_delete)) }
                         },
                         dismissButton = {
-                            TextButton(onClick = { pendingDelete = null }) { Text("Cancel") }
+                            TextButton(onClick = { pendingDelete = null }) { Text(stringResource(R.string.action_cancel)) }
                         },
                     )
                 }
@@ -243,7 +244,7 @@ private fun KeyboardThemeLibrary(
     ) {
         item {
             Text(
-                text = "Choose a keyboard look. Layout and letter arrangement stay independent.",
+                text = stringResource(R.string.themes_explanation),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(bottom = 4.dp),
@@ -253,7 +254,7 @@ private fun KeyboardThemeLibrary(
             val selectedThemeName = (customThemes + KeyboardThemeCatalog.builtIns)
                 .firstOrNull { it.id == selectedThemeId }
                 ?.name
-                ?: "selected theme"
+                ?: stringResource(R.string.selected_theme)
             FilledTonalButton(
                 onClick = onCreate,
                 modifier = Modifier.fillMaxWidth(),
@@ -266,16 +267,16 @@ private fun KeyboardThemeLibrary(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.Start,
                 ) {
-                    Text("Create from $selectedThemeName", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.theme_create_from, selectedThemeName), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        "Makes an editable copy; the original theme stays unchanged",
+                        stringResource(R.string.theme_create_sub),
                         style = MaterialTheme.typography.bodySmall,
                     )
                 }
             }
         }
         if (customThemes.isNotEmpty()) {
-            item { ThemeSectionTitle("Your themes") }
+            item { ThemeSectionTitle(stringResource(R.string.your_themes)) }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     customThemes.forEachIndexed { index, theme ->
@@ -296,7 +297,7 @@ private fun KeyboardThemeLibrary(
                 }
             }
         }
-        item { ThemeSectionTitle("Built-in themes") }
+        item { ThemeSectionTitle(stringResource(R.string.builtin_themes)) }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 KeyboardThemeCatalog.builtIns.forEachIndexed { index, theme ->
@@ -354,7 +355,7 @@ private fun KeyboardThemeCard(
             bottomEnd = if (last) 28.dp else 4.dp,
         ),
         color = if (selected) MaterialTheme.colorScheme.primaryContainer
-        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+        else MaterialTheme.colorScheme.surfaceContainerHigh,
         contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer
         else MaterialTheme.colorScheme.onSurface,
     ) {
@@ -380,14 +381,14 @@ private fun KeyboardThemeCard(
             )
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "More options for ${theme.name}")
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.cd_more_options, theme.name))
                 }
                 DropdownMenu(
                     expanded = menuExpanded,
                     onDismissRequest = { menuExpanded = false },
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Copy") },
+                        text = { Text(stringResource(R.string.action_copy)) },
                         leadingIcon = { Icon(Icons.Default.ContentCopy, contentDescription = null) },
                         onClick = {
                             menuExpanded = false
@@ -396,7 +397,7 @@ private fun KeyboardThemeCard(
                     )
                     onEdit?.let { edit ->
                         DropdownMenuItem(
-                            text = { Text("Edit") },
+                            text = { Text(stringResource(R.string.action_edit)) },
                             leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
                             onClick = {
                                 menuExpanded = false
@@ -406,7 +407,7 @@ private fun KeyboardThemeCard(
                     }
                     onDelete?.let { delete ->
                         DropdownMenuItem(
-                            text = { Text("Delete") },
+                            text = { Text(stringResource(R.string.action_delete)) },
                             leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null) },
                             onClick = {
                                 menuExpanded = false
@@ -434,13 +435,13 @@ private fun KeyboardThemeSwatches(theme: KeyboardThemeDefinition) {
     }
 }
 
-private enum class ThemeEditTarget(val label: String) {
-    CASE("Case"),
-    PLATE("Background"),
-    ALPHA("Alpha keys"),
-    MODIFIER("Control keys"),
-    ACCENT("Accent keys"),
-    KEY("One key"),
+private enum class ThemeEditTarget(@androidx.annotation.StringRes val label: Int) {
+    CASE(R.string.theme_target_case),
+    PLATE(R.string.theme_target_background),
+    ALPHA(R.string.theme_target_alpha),
+    MODIFIER(R.string.theme_target_control),
+    ACCENT(R.string.theme_target_accent),
+    KEY(R.string.theme_target_one),
 }
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -512,24 +513,24 @@ private fun KeyboardThemeEditor(
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         ThemeEditorSection(
-            title = "Theme details",
-            supportingText = "Give this keyboard-only theme a name you will recognize.",
+            title = stringResource(R.string.theme_details),
+            supportingText = stringResource(R.string.theme_details_sub),
         ) {
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it.take(40) },
-                label = { Text("Theme name") },
+                label = { Text(stringResource(R.string.theme_name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
             )
         }
 
         ThemeEditorSection(
-            title = "Live preview",
-            supportingText = "Pick a geometry to preview. This does not change the layout saved on the keyboard screen.",
+            title = stringResource(R.string.live_preview),
+            supportingText = stringResource(R.string.live_preview_sub),
         ) {
             Text(
-                "Preview layout",
+                stringResource(R.string.preview_layout),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -578,15 +579,15 @@ private fun KeyboardThemeEditor(
                 }
             }
             Text(
-                "Tap a key for a one-key override, or edit a key group below.",
+                stringResource(R.string.theme_tap_key_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
         ThemeEditorSection(
-            title = "Customize keys",
-            supportingText = "Change the keyboard case, background, a whole key group, or the selected key.",
+            title = stringResource(R.string.customize_keys),
+            supportingText = stringResource(R.string.customize_keys_sub),
         ) {
             FlowRow(
                 modifier = Modifier.fillMaxWidth(),
@@ -601,9 +602,9 @@ private fun KeyboardThemeEditor(
                         label = {
                             Text(
                                 if (editTarget == ThemeEditTarget.KEY && selectedKey != null) {
-                                    "Key: ${selectedKey?.legend?.ifEmpty { "Space" }}"
+                                    stringResource(R.string.theme_key_label, selectedKey?.legend?.ifEmpty { "Space" }.orEmpty())
                                 } else {
-                                    editTarget.label
+                                    stringResource(editTarget.label)
                                 },
                             )
                         },
@@ -613,24 +614,24 @@ private fun KeyboardThemeEditor(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
             if (target == ThemeEditTarget.CASE) {
-                VisualColorPicker("Keyboard case", caseArgb) { caseArgb = it }
+                VisualColorPicker(stringResource(R.string.keyboard_case), caseArgb) { caseArgb = it }
                 FilterChip(
                     selected = caseMetallic,
                     onClick = { caseMetallic = !caseMetallic },
-                    label = { Text("Metallic finish") },
+                    label = { Text(stringResource(R.string.metallic_finish)) },
                 )
             } else if (target == ThemeEditTarget.PLATE) {
-                VisualColorPicker("Keyboard background", plateArgb) { plateArgb = it }
+                VisualColorPicker(stringResource(R.string.keyboard_background), plateArgb) { plateArgb = it }
             } else if (selectedStyle != null) {
-                VisualColorPicker("Key color", selectedStyle.backgroundArgb) { color ->
+                VisualColorPicker(stringResource(R.string.key_color), selectedStyle.backgroundArgb) { color ->
                     updateTargetStyle { it.copy(backgroundArgb = color) }
                 }
                 HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
-                VisualColorPicker("Key text color", selectedStyle.legendArgb) { color ->
+                VisualColorPicker(stringResource(R.string.key_text_color), selectedStyle.legendArgb) { color ->
                     updateTargetStyle { it.copy(legendArgb = color) }
                 }
                 Text(
-                    "Text size: ${(selectedStyle.legendScale * 100).roundToInt()}%",
+                    stringResource(R.string.text_size, (selectedStyle.legendScale * 100).roundToInt()),
                     style = MaterialTheme.typography.titleSmall,
                 )
                 Slider(
@@ -643,7 +644,7 @@ private fun KeyboardThemeEditor(
                         onClick = { selectedKey?.let { overrides.remove(it.styleId) } },
                         modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text("Reset this key to its group")
+                        Text(stringResource(R.string.reset_key))
                     }
                 }
             }
@@ -658,7 +659,7 @@ private fun KeyboardThemeEditor(
                 onClick = onCancel,
                 modifier = Modifier.weight(1f),
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.action_cancel))
             }
             Button(
                 enabled = name.isNotBlank(),
@@ -667,7 +668,7 @@ private fun KeyboardThemeEditor(
             ) {
                 Icon(Icons.Default.Palette, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Save")
+                Text(stringResource(R.string.action_save))
             }
         }
         Spacer(Modifier.height(24.dp))
@@ -683,7 +684,7 @@ private fun ThemeEditorSection(
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp),

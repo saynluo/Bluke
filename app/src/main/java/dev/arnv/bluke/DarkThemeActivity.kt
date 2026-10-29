@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,10 +38,10 @@ class DarkThemeActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Dark theme") },
+                            title = { Text(stringResource(R.string.dark_theme_title)) },
                             navigationIcon = {
                                 IconButton(onClick = { finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                 }
                             },
                             colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -63,7 +64,7 @@ class DarkThemeActivity : ComponentActivity() {
                         SettingsCardGroup(
                             items = listOf(
                                 SettingsItemData(
-                                    title = "System",
+                                    title = stringResource(R.string.theme_system),
                                     action = {
                                         RadioButton(
                                             selected = themeMode == 0,
@@ -79,7 +80,7 @@ class DarkThemeActivity : ComponentActivity() {
                                     }
                                 ),
                                 SettingsItemData(
-                                    title = "Off",
+                                    title = stringResource(R.string.theme_off),
                                     action = {
                                         RadioButton(
                                             selected = themeMode == 1,
@@ -95,7 +96,7 @@ class DarkThemeActivity : ComponentActivity() {
                                     }
                                 ),
                                 SettingsItemData(
-                                    title = "On",
+                                    title = stringResource(R.string.theme_on),
                                     action = {
                                         RadioButton(
                                             selected = themeMode == 2,
@@ -114,11 +115,11 @@ class DarkThemeActivity : ComponentActivity() {
                         )
 
                         SettingsCardGroup(
-                            title = "Additional settings",
+                            title = stringResource(R.string.additional_settings),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "High contrast dark mode",
-                                    subtitle = "Pitch black dark theme for devices with OLED display",
+                                    title = stringResource(R.string.high_contrast_title),
+                                    subtitle = stringResource(R.string.high_contrast_sub),
                                     icon = { Icon(Icons.Default.Contrast, null, tint = MaterialTheme.colorScheme.primary) },
                                     action = {
                                         Switch(

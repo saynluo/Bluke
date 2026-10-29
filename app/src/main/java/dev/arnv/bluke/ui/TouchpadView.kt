@@ -1,5 +1,7 @@
 package dev.arnv.bluke.ui
 
+import androidx.compose.ui.res.stringResource
+import androidx.annotation.StringRes
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
@@ -51,10 +53,10 @@ import dev.arnv.bluke.data.KeyboardThemeRepository
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
-enum class TrackpadButtonMode(val displayName: String) {
-    CLICKPAD("Clickpad"),
-    TWO_BUTTONS("2-Button L/R"),
-    THREE_BUTTONS("3-Button L/M/R")
+enum class TrackpadButtonMode(@StringRes val labelRes: Int) {
+    CLICKPAD(R.string.trackpad_clickpad),
+    TWO_BUTTONS(R.string.trackpad_two_buttons),
+    THREE_BUTTONS(R.string.trackpad_three_buttons)
 }
 
 @SuppressLint("MissingPermission")
@@ -158,13 +160,13 @@ fun TouchpadView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Exit",
+                            contentDescription = stringResource(R.string.cd_exit),
                             tint = Color.White,
                             modifier = Modifier.size(10.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "Close",
+                            text = stringResource(R.string.action_close),
                             color = Color.White,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
@@ -178,8 +180,8 @@ fun TouchpadView(
                             .clip(RoundedCornerShape(6.dp))
                             .background(Color.White.copy(alpha = 0.15f))
                             .combinedClickable(
-                                onClickLabel = "Next input mode",
-                                onLongClickLabel = "Configure input mode cycle",
+                                onClickLabel = stringResource(R.string.cd_next_input_mode),
+                                onLongClickLabel = stringResource(R.string.cd_configure_input_cycle),
                                 onClick = {
                                     val enabledModes = sharedPrefs.enabledInputModes().map(InputMode::id)
                                     val currentIndexInEnabled = enabledModes.indexOf(launchMode)
@@ -199,12 +201,12 @@ fun TouchpadView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Mouse,
-                            contentDescription = "Switch Mode",
+                            contentDescription = stringResource(R.string.cd_switch_mode),
                             tint = Color.White,
                             modifier = Modifier.size(11.dp)
                         )
                         Text(
-                            text = "Touchpad Mode",
+                            text = stringResource(R.string.touchpad_mode),
                             color = Color.White,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
@@ -214,7 +216,7 @@ fun TouchpadView(
                     // Connection status
                     val connectedDevNow by btManager.connectedDevice.collectAsState()
                     val isConnected = connectedDevNow != null
-                    val deviceName = (connectedDevNow ?: btManager.getReconnectTarget())?.name ?: "No Host"
+                    val deviceName = (connectedDevNow ?: btManager.getReconnectTarget())?.name ?: stringResource(R.string.no_host)
                     val statusLedColor = if (isConnected) Color(0xFF39FF14) else Color(0xFFFF9800)
                     Box(
                         modifier = Modifier
@@ -258,9 +260,9 @@ fun TouchpadView(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
-                        Icon(Icons.Default.Keyboard, "Modifier key position", tint = Color.White, modifier = Modifier.size(12.dp))
+                        Icon(Icons.Default.Keyboard, stringResource(R.string.cd_modifier_position), tint = Color.White, modifier = Modifier.size(12.dp))
                         Text(
-                            modifierPosition.displayName,
+                            stringResource(modifierPosition.labelRes),
                             color = Color.White,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold,
@@ -284,20 +286,20 @@ fun TouchpadView(
                         if (showNumpadLed) {
                             Icon(
                                 imageVector = Icons.Default.Dialpad,
-                                contentDescription = "LED Pad",
+                                contentDescription = stringResource(R.string.cd_numpad_led),
                                 tint = Color.White,
                                 modifier = Modifier.size(12.dp)
                             )
                         } else {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_dialpad_off),
-                                contentDescription = "LED Pad",
+                                contentDescription = stringResource(R.string.cd_numpad_led),
                                 tint = Color.White,
                                 modifier = Modifier.size(12.dp)
                             )
                         }
                         Text(
-                            text = "Numpad",
+                            text = stringResource(R.string.numpad),
                             color = Color.White,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
@@ -322,12 +324,12 @@ fun TouchpadView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Mouse,
-                            contentDescription = "Button Mode",
+                            contentDescription = stringResource(R.string.cd_button_mode),
                             tint = Color.White,
                             modifier = Modifier.size(12.dp)
                         )
                         Text(
-                            text = buttonMode.displayName,
+                            text = stringResource(buttonMode.labelRes),
                             color = Color.White,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
@@ -352,7 +354,7 @@ fun TouchpadView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Speed,
-                            contentDescription = "Sensitivity",
+                            contentDescription = stringResource(R.string.sensitivity),
                             tint = Color.White,
                             modifier = Modifier.size(12.dp)
                         )
@@ -382,7 +384,7 @@ fun TouchpadView(
                     ) {
                         Icon(
                             imageVector = Icons.Default.KeyboardDoubleArrowUp,
-                            contentDescription = "Scroll Speed",
+                            contentDescription = stringResource(R.string.scroll_speed),
                             tint = Color.White,
                             modifier = Modifier.size(12.dp)
                         )
@@ -414,14 +416,14 @@ fun TouchpadView(
                         if (isVibrationEnabled) {
                             Icon(
                                 imageVector = Icons.Default.Vibration,
-                                contentDescription = "Haptics Vibration",
+                                contentDescription = stringResource(R.string.cd_haptics),
                                 tint = Color.White,
                                 modifier = Modifier.size(12.dp)
                             )
                         } else {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_vibration_off),
-                                contentDescription = "Haptics Vibration",
+                                contentDescription = stringResource(R.string.cd_haptics),
                                 tint = Color.White,
                                 modifier = Modifier.size(12.dp)
                             )

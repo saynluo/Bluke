@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -126,7 +127,7 @@ class SoundPacksActivity : ComponentActivity() {
                         scope.launch {
                             val result = withContext(Dispatchers.IO) {
                                 contentResolver.openInputStream(uri)?.use(repository::importZip)
-                                    ?: SoundPackImportResult.Failure("Could not read the selected file.")
+                                    ?: SoundPackImportResult.Failure(getString(R.string.sound_import_read_failed))
                             }
                             importing = false
                             when (result) {
@@ -135,10 +136,10 @@ class SoundPacksActivity : ComponentActivity() {
                                     selectedProfileId = customSoundProfileId(result.pack.id)
                                     cycleSelection = cycleSelection + customSoundProfileId(result.pack.id)
                                     saveSoundCycleSelection(preferences, cycleSelection)
-                                    snackbarHostState.showSnackbar("Imported and selected ${result.pack.name}.")
+                                    snackbarHostState.showSnackbar(getString(R.string.sound_imported, result.pack.name))
                                 }
                                 is SoundPackImportResult.Duplicate -> {
-                                    snackbarHostState.showSnackbar("${result.pack.name} is already imported.")
+                                    snackbarHostState.showSnackbar(getString(R.string.sound_already_imported, result.pack.name))
                                 }
                                 is SoundPackImportResult.Failure -> {
                                     snackbarHostState.showSnackbar(result.message)
@@ -152,8 +153,8 @@ class SoundPacksActivity : ComponentActivity() {
                 pendingDeletion?.let { pack ->
                     AlertDialog(
                         onDismissRequest = { pendingDeletion = null },
-                        title = { Text("Delete ${pack.name}?") },
-                        text = { Text("This removes the imported pack from Bluke. Built-in sounds are not affected.") },
+                        title = { Text(stringResource(R.string.sound_delete_title, pack.name)) },
+                        text = { Text(stringResource(R.string.sound_delete_body)) },
                         confirmButton = {
                             TextButton(
                                 onClick = {
@@ -175,16 +176,16 @@ class SoundPacksActivity : ComponentActivity() {
                                             cycleSelection = nextCycle
                                             saveSoundCycleSelection(preferences, nextCycle)
                                             selectProfile(nextSelected)
-                                            snackbarHostState.showSnackbar("Deleted ${pack.name}.")
+                                            snackbarHostState.showSnackbar(getString(R.string.sound_deleted, pack.name))
                                         } else {
-                                            snackbarHostState.showSnackbar("Could not delete ${pack.name}.")
+                                            snackbarHostState.showSnackbar(getString(R.string.sound_delete_failed, pack.name))
                                         }
                                     }
                                 },
-                            ) { Text("Delete") }
+                            ) { Text(stringResource(R.string.action_delete)) }
                         },
                         dismissButton = {
-                            TextButton(onClick = { pendingDeletion = null }) { Text("Cancel") }
+                            TextButton(onClick = { pendingDeletion = null }) { Text(stringResource(R.string.action_cancel)) }
                         },
                     )
                 }
@@ -193,10 +194,10 @@ class SoundPacksActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Key sounds") },
+                            title = { Text(stringResource(R.string.key_sounds_title)) },
                             navigationIcon = {
                                 IconButton(onClick = ::finish) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                 }
                             },
                             scrollBehavior = scrollBehavior,
@@ -220,7 +221,7 @@ class SoundPacksActivity : ComponentActivity() {
                                     Icon(Icons.Default.Add, contentDescription = null)
                                 }
                             },
-                            text = { Text(if (importing) "Importing…" else "Import pack") },
+                            text = { Text(if (importing) stringResource(R.string.importing) else stringResource(R.string.import_pack)) },
                         )
                     },
                 ) { innerPadding ->
@@ -233,12 +234,12 @@ class SoundPacksActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         Text(
-                            "Choose one sound profile for every key press. Imported Mechvibes packs live beside Bluke's built-in switch sounds and can be reached by the keyboard toolbar cycle.",
+                            stringResource(R.string.key_sounds_explanation),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
-                            "Sound profiles",
+                            stringResource(R.string.sound_profiles),
                             style = MaterialTheme.typography.titleSmall,
                             color = MaterialTheme.colorScheme.primary,
                         )
@@ -248,7 +249,7 @@ class SoundPacksActivity : ComponentActivity() {
                             choices.forEachIndexed { index, choice ->
                                 SoundProfileChoice(
                                     title = choice.title,
-                                    subtitle = choice.subtitle,
+                                    subtitle = stringResource(choice.subtitle),
                                     selected = selectedProfileId == choice.id,
                                     includedInCycle = choice.id in cycleSelection,
                                     canRemoveFromCycle = choice.id !in cycleSelection || cycleSelection.size > 1,
@@ -278,7 +279,7 @@ class SoundPacksActivity : ComponentActivity() {
                         }
                         if (packs.isEmpty()) {
                             Text(
-                                "Imported packs will appear in this same list.",
+                                stringResource(R.string.sound_imported_hint),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -294,18 +295,18 @@ class SoundPacksActivity : ComponentActivity() {
 private sealed interface SoundChoice {
     val id: String
     val title: String
-    val subtitle: String
+    @get:androidx.annotation.StringRes val subtitle: Int
 
     data class BuiltIn(val switchType: SwitchType) : SoundChoice {
         override val id = builtInSoundProfileId(switchType)
         override val title = switchType.displayName
-        override val subtitle = "Built-in"
+        override val subtitle = R.string.sound_builtin
     }
 
     data class Imported(val pack: CustomSoundPack) : SoundChoice {
         override val id = customSoundProfileId(pack.id)
         override val title = pack.name
-        override val subtitle = "Imported Mechvibes pack"
+        override val subtitle = R.string.sound_imported_pack
     }
 }
 
@@ -334,7 +335,7 @@ private fun SoundProfileChoice(
         color = if (selected) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            MaterialTheme.colorScheme.surfaceContainerHigh
         },
     ) {
         Row(
@@ -367,7 +368,7 @@ private fun SoundProfileChoice(
                 )
             }
             if (selected) {
-                Icon(Icons.Default.Check, contentDescription = "Selected")
+                Icon(Icons.Default.Check, contentDescription = stringResource(R.string.cd_selected))
             }
             Checkbox(
                 checked = includedInCycle,
@@ -376,7 +377,7 @@ private fun SoundProfileChoice(
             )
             if (onDelete != null) {
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete $title")
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.cd_delete_item, title))
                 }
             }
         }

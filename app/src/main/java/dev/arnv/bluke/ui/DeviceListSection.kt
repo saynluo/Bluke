@@ -1,5 +1,7 @@
 package dev.arnv.bluke.ui
 
+import dev.arnv.bluke.R
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import androidx.compose.foundation.clickable
@@ -46,10 +48,10 @@ internal fun LazyListScope.DeviceListSection(
     if (currentlyConnectedState != null) {
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
-                SectionTitle("ACTIVE CONNECTION")
+                SectionTitle(stringResource(R.string.section_active_connection))
                 val deviceMessage = if ((currentlyConnectedState.name != null && statusMessage.contains(currentlyConnectedState.name)) || bluetoothState is BluetoothState.Connected) statusMessage else null
                 DeviceRow(
-                    name = currentlyConnectedState.name ?: "Unknown Host",
+                    name = currentlyConnectedState.name ?: stringResource(R.string.unknown_host),
                     address = currentlyConnectedState.address,
                     showAddress = showMacAddress,
                     isConnected = true,
@@ -65,12 +67,12 @@ internal fun LazyListScope.DeviceListSection(
         val activeDeviceAttempt = (bondedDevices + scannedDevices).firstOrNull {
             it.address == connectionTargetAddress
         }
-        if (activeDeviceAttempt != null && statusMessage.isNotEmpty() && statusMessage != "Disconnected") {
+        if (activeDeviceAttempt != null && statusMessage.isNotEmpty()) {
             item {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    SectionTitle("ACTIVE CONNECTION")
+                    SectionTitle(stringResource(R.string.section_active_connection))
                     DeviceRow(
-                        name = activeDeviceAttempt.name ?: "Unknown Host",
+                        name = activeDeviceAttempt.name ?: stringResource(R.string.unknown_host),
                         address = activeDeviceAttempt.address,
                         showAddress = showMacAddress,
                         isConnected = false,
@@ -95,7 +97,7 @@ internal fun LazyListScope.DeviceListSection(
     if (idleBonded.isNotEmpty()) {
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
-                CollapsibleSectionHeader("PAIRED DEVICES", "${idleBonded.size} devices", isPairedExpanded) {
+                CollapsibleSectionHeader(stringResource(R.string.section_paired_devices), stringResource(R.string.device_count, idleBonded.size), isPairedExpanded) {
                     onPairedExpandedChange(!isPairedExpanded)
                 }
                 if (isPairedExpanded) {
@@ -103,7 +105,7 @@ internal fun LazyListScope.DeviceListSection(
                         idleBonded.forEachIndexed { index, device ->
                             val deviceMsg = if (device.address == connectionTargetAddress) statusMessage else null
                             DeviceRow(
-                                name = device.name ?: "Unknown Host",
+                                name = device.name ?: stringResource(R.string.unknown_host),
                                 address = device.address,
                                 showAddress = showMacAddress,
                                 isConnected = false,
@@ -121,9 +123,9 @@ internal fun LazyListScope.DeviceListSection(
     } else if (bondedDevices.isEmpty()) {
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
-                SectionTitle("PAIRED DEVICES")
+                SectionTitle(stringResource(R.string.section_paired_devices))
                 Text(
-                    text = "No paired devices yet.",
+                    text = stringResource(R.string.no_paired_devices),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(start = 12.dp, top = 4.dp)
@@ -141,7 +143,7 @@ internal fun LazyListScope.DeviceListSection(
     if (nonBondedDevices.isNotEmpty() || isScanning) {
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
-                CollapsibleSectionHeader("DISCOVERED DEVICES", "${nonBondedDevices.size} found", isDiscoveredExpanded) {
+                CollapsibleSectionHeader(stringResource(R.string.section_discovered_devices), stringResource(R.string.found_count, nonBondedDevices.size), isDiscoveredExpanded) {
                     onDiscoveredExpandedChange(!isDiscoveredExpanded)
                 }
                 if (isDiscoveredExpanded) {
@@ -149,7 +151,7 @@ internal fun LazyListScope.DeviceListSection(
                         nonBondedDevices.forEachIndexed { index, device ->
                             val deviceMsg = if (device.address == connectionTargetAddress) statusMessage else null
                             DeviceRow(
-                                name = device.name ?: "Unnamed Device",
+                                name = device.name ?: stringResource(R.string.unnamed_device),
                                 address = device.address,
                                 showAddress = showMacAddress,
                                 isConnected = false,
@@ -169,13 +171,7 @@ internal fun LazyListScope.DeviceListSection(
 
 @androidx.compose.runtime.Composable
 private fun SectionTitle(text: String) {
-    Text(
-        text = text,
-        style = MaterialTheme.typography.bodyMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.padding(start = 12.dp, bottom = 8.dp)
-    )
+    SettingsSectionHeader(text, Modifier.padding(start = 12.dp, bottom = 8.dp))
 }
 
 @androidx.compose.runtime.Composable
@@ -185,12 +181,12 @@ private fun CollapsibleSectionHeader(title: String, count: String, expanded: Boo
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(title, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+        SettingsSectionHeader(title)
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(count, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Icon(
                 imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                contentDescription = "Expand",
+                contentDescription = stringResource(R.string.cd_expand),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 4.dp).size(18.dp)
             )
@@ -198,7 +194,7 @@ private fun CollapsibleSectionHeader(title: String, count: String, expanded: Boo
     }
 }
 
-private fun listShape(index: Int, lastIndex: Int): RoundedCornerShape {
+internal fun listShape(index: Int, lastIndex: Int): RoundedCornerShape {
     val topRadius = if (index == 0) 28.dp else 4.dp
     val bottomRadius = if (index == lastIndex) 28.dp else 4.dp
     return RoundedCornerShape(topStart = topRadius, topEnd = topRadius, bottomStart = bottomRadius, bottomEnd = bottomRadius)

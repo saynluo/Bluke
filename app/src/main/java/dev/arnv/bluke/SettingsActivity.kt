@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -50,10 +51,10 @@ class SettingsActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Settings") },
+                            title = { Text(stringResource(R.string.settings_title)) },
                             navigationIcon = {
                                 IconButton(onClick = { finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                 }
                             },
                             colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -73,27 +74,27 @@ class SettingsActivity : ComponentActivity() {
                     ) {
                         Spacer(Modifier.height(8.dp))
                         SettingsCardGroup(
-                            title = "Personalization",
+                            title = stringResource(R.string.settings_group_personalization),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Look & Feel",
-                                    subtitle = "App colors, dark theme, haptics, and key sounds",
+                                    title = stringResource(R.string.look_and_feel_title),
+                                    subtitle = stringResource(R.string.settings_look_subtitle),
                                     icon = { Icon(Icons.Default.ColorLens, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { 
                                         startActivity(Intent(this@SettingsActivity, LookAndFeelActivity::class.java))
                                     }
                                 ),
                                 SettingsItemData(
-                                    title = "Keyboard",
-                                    subtitle = "Typing behavior, layouts, themes, and key sounds",
+                                    title = stringResource(R.string.keyboard_settings_title),
+                                    subtitle = stringResource(R.string.settings_keyboard_subtitle),
                                     icon = { Icon(Icons.Default.Keyboard, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = {
                                         startActivity(Intent(this@SettingsActivity, KeyboardSettingsActivity::class.java))
                                     }
                                 ),
                                 SettingsItemData(
-                                    title = "Controller",
-                                    subtitle = "Gamepad behavior and compatibility",
+                                    title = stringResource(R.string.controller_settings_title),
+                                    subtitle = stringResource(R.string.settings_controller_subtitle),
                                     icon = { Icon(Icons.Default.Gamepad, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = {
                                         startActivity(Intent(this@SettingsActivity, ControllerSettingsActivity::class.java))
@@ -102,11 +103,11 @@ class SettingsActivity : ComponentActivity() {
                             )
                         )
                         SettingsCardGroup(
-                            title = "Controls & connection",
+                            title = stringResource(R.string.settings_group_controls),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Behavior",
-                                    subtitle = "Bluetooth discovery, reconnect, and remote controls",
+                                    title = stringResource(R.string.behavior_title),
+                                    subtitle = stringResource(R.string.settings_behavior_subtitle),
                                     icon = { Icon(Icons.Default.Settings, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { 
                                         startActivity(Intent(this@SettingsActivity, BehaviorActivity::class.java))
@@ -115,19 +116,19 @@ class SettingsActivity : ComponentActivity() {
                             )
                         )
                         SettingsCardGroup(
-                            title = "Support",
+                            title = stringResource(R.string.settings_group_support),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Help & troubleshooting",
-                                    subtitle = "Pairing repair, controller setup, browser games, and limitations",
+                                    title = stringResource(R.string.help_title),
+                                    subtitle = stringResource(R.string.settings_help_subtitle),
                                     icon = { Icon(Icons.AutoMirrored.Filled.HelpOutline, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = {
                                         startActivity(Intent(this@SettingsActivity, HelpActivity::class.java))
                                     }
                                 ),
                                 SettingsItemData(
-                                    title = "About",
-                                    subtitle = "Version, contributors, licenses, and support",
+                                    title = stringResource(R.string.about_title),
+                                    subtitle = stringResource(R.string.settings_about_subtitle),
                                     icon = { Icon(Icons.Default.Info, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { 
                                         startActivity(Intent(this@SettingsActivity, AboutActivity::class.java))
@@ -136,8 +137,8 @@ class SettingsActivity : ComponentActivity() {
                             ).let { baseList ->
                                 if (isDevMode) {
                                     baseList + SettingsItemData(
-                                        title = "Developer options",
-                                        subtitle = "Testing and debugging controls",
+                                        title = stringResource(R.string.developer_options_title),
+                                        subtitle = stringResource(R.string.settings_developer_subtitle),
                                         icon = { Icon(Icons.Default.Code, null, tint = MaterialTheme.colorScheme.primary) },
                                         onClick = { 
                                             startActivity(Intent(this@SettingsActivity, DeveloperOptionsActivity::class.java))

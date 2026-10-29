@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -60,10 +61,10 @@ class LookAndFeelActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Look & Feel") },
+                            title = { Text(stringResource(R.string.look_and_feel_title)) },
                             navigationIcon = {
                                 IconButton(onClick = { finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                 }
                             },
                             colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -188,11 +189,11 @@ class LookAndFeelActivity : ComponentActivity() {
                         }
 
                         SettingsCardGroup(
-                            title = "Color Palette",
+                            title = stringResource(R.string.color_palette),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Dynamic colors",
-                                    subtitle = "Automatically set the app theme according to the device wallpaper",
+                                    title = stringResource(R.string.dynamic_colors),
+                                    subtitle = stringResource(R.string.dynamic_colors_sub),
                                     icon = { Icon(Icons.Default.FormatPaint, null, tint = MaterialTheme.colorScheme.primary) },
                                     action = {
                                         Switch(
@@ -206,8 +207,8 @@ class LookAndFeelActivity : ComponentActivity() {
                                     }
                                 ),
                                 SettingsItemData(
-                                    title = "Palette style",
-                                    subtitle = paletteStyleState,
+                                    title = stringResource(R.string.palette_style),
+                                    subtitle = stringResource(PaletteStyleLabels[paletteStyleState] ?: R.string.palette_tonal_spot),
                                     icon = { Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { showPaletteDialog = true }
                                 )
@@ -217,10 +218,10 @@ class LookAndFeelActivity : ComponentActivity() {
                         if (showPaletteDialog) {
                             AlertDialog(
                                 onDismissRequest = { showPaletteDialog = false },
-                                title = { Text("Palette style") },
+                                title = { Text(stringResource(R.string.palette_style)) },
                                 text = {
                                     Column {
-                                        listOf("Tonal Spot", "Vibrant", "Expressive", "Rainbow", "Fruit Salad", "Fidelity", "Content", "Neutral", "Monochrome").forEach { option ->
+                                        PaletteStyleLabels.keys.forEach { option ->
                                             Row(
                                                 verticalAlignment = Alignment.CenterVertically,
                                                 modifier = Modifier.fillMaxWidth().clickable { 
@@ -231,29 +232,29 @@ class LookAndFeelActivity : ComponentActivity() {
                                             ) {
                                                 RadioButton(selected = option == paletteStyleState, onClick = null)
                                                 Spacer(Modifier.width(16.dp))
-                                                Text(option)
+                                                Text(stringResource(PaletteStyleLabels.getValue(option)))
                                             }
                                         }
                                     }
                                 },
                                 confirmButton = {
-                                    TextButton(onClick = { showPaletteDialog = false }) { Text("Confirm") }
+                                    TextButton(onClick = { showPaletteDialog = false }) { Text(stringResource(R.string.action_confirm)) }
                                 },
                                 dismissButton = {
-                                    TextButton(onClick = { showPaletteDialog = false }) { Text("Cancel") }
+                                    TextButton(onClick = { showPaletteDialog = false }) { Text(stringResource(R.string.action_cancel)) }
                                 }
                             )
                         }
                         
                         SettingsCardGroup(
-                            title = "Additional settings",
+                            title = stringResource(R.string.additional_settings),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Dark theme",
+                                    title = stringResource(R.string.dark_theme_title),
                                     subtitle = when(themeMode) {
-                                        0 -> "System"
-                                        1 -> "Off"
-                                        else -> "On"
+                                        0 -> stringResource(R.string.theme_system)
+                                        1 -> stringResource(R.string.theme_off)
+                                        else -> stringResource(R.string.theme_on)
                                     },
                                     icon = { Icon(Icons.Default.DarkMode, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { 
@@ -261,8 +262,8 @@ class LookAndFeelActivity : ComponentActivity() {
                                     }
                                 ),
                                 SettingsItemData(
-                                    title = "Haptics & Vibration",
-                                    subtitle = "Interactive haptics for touch feedback",
+                                    title = stringResource(R.string.haptics_vibration),
+                                    subtitle = stringResource(R.string.haptics_vibration_sub),
                                     icon = { Icon(Icons.Default.Vibration, null, tint = MaterialTheme.colorScheme.primary) },
                                     action = {
                                         Switch(
@@ -275,8 +276,8 @@ class LookAndFeelActivity : ComponentActivity() {
                                     }
                                 ),
                                 SettingsItemData(
-                                    title = "Enable sounds",
-                                    subtitle = "Play sound effect on key press",
+                                    title = stringResource(R.string.enable_sounds),
+                                    subtitle = stringResource(R.string.enable_sounds_sub),
                                     icon = { Icon(Icons.AutoMirrored.Filled.VolumeUp, null, tint = MaterialTheme.colorScheme.primary) },
                                     action = {
                                         Switch(
@@ -306,3 +307,15 @@ class LookAndFeelActivity : ComponentActivity() {
         themeModeState.intValue = sharedPrefs.getInt("theme_mode", 0)
     }
 }
+
+private val PaletteStyleLabels = linkedMapOf(
+    "Tonal Spot" to R.string.palette_tonal_spot,
+    "Vibrant" to R.string.palette_vibrant,
+    "Expressive" to R.string.palette_expressive,
+    "Rainbow" to R.string.palette_rainbow,
+    "Fruit Salad" to R.string.palette_fruit_salad,
+    "Fidelity" to R.string.palette_fidelity,
+    "Content" to R.string.palette_content,
+    "Neutral" to R.string.palette_neutral,
+    "Monochrome" to R.string.palette_monochrome,
+)

@@ -27,8 +27,11 @@ Bluke communicates directly with your host device (PC, laptop, tablet, or phone)
 
 When Bluetooth is inconvenient, the phone and computer can talk over the same local network instead. This needs a small receiver script on the computer.
 
-1. Turn on **LAN Connection** on Bluke's home screen. It shows the phone's address and a 6-digit PIN (new every time it is turned on).
-2. On the computer: `pip install pynput`, then run `python tools/bluke_lan_receiver.py <phone-ip> <pin>`.
+1. On the computer: `pip install pynput`, then run `python tools/bluke_lan_receiver.py`. It prints a 6-digit PIN, which stays the same across runs (stored in `~/.bluke_receiver_pin`; delete that file to get a new one).
+2. In Bluke, switch the home screen to **LAN**. It searches the network and lists computers running the receiver.
+3. Tap the computer and enter the PIN. Bluke remembers the PIN for that computer, so reconnecting is one tap.
+
+The receiver uses TCP port 7393 and UDP port 7394; allow Python through the computer's firewall when asked. If the computer never shows up, the network may block broadcast discovery (common on guest or isolated Wi-Fi).
 
 Keyboard, touchpad and media keys work over LAN; gamepad mode and Caps/Num Lock LED sync are Bluetooth-only. Traffic is unencrypted, so only use it on a network you trust.
 

@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -75,8 +76,8 @@ class KeyboardLayoutsActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Keyboard layouts") },
-                            navigationIcon = { IconButton(onClick = ::finish) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                            title = { Text(stringResource(R.string.keyboard_layouts_title)) },
+                            navigationIcon = { IconButton(onClick = ::finish) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.cd_back)) } },
                             scrollBehavior = scrollBehavior,
                         )
                     },
@@ -88,7 +89,7 @@ class KeyboardLayoutsActivity : ComponentActivity() {
                     ) {
                         item {
                             Text(
-                                "Tap a layout to use it. Check the layouts included when tapping the keyboard toolbar button.",
+                                stringResource(R.string.keyboard_layouts_explanation),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.padding(bottom = 12.dp),
@@ -113,7 +114,7 @@ class KeyboardLayoutsActivity : ComponentActivity() {
                                     bottomStart = if (index == KeyboardGeometry.entries.lastIndex) 28.dp else 4.dp,
                                     bottomEnd = if (index == KeyboardGeometry.entries.lastIndex) 28.dp else 4.dp,
                                 ),
-                                color = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .55f),
+                                color = if (active) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp),
@@ -122,9 +123,9 @@ class KeyboardLayoutsActivity : ComponentActivity() {
                                     Icon(Icons.Default.Keyboard, null, tint = MaterialTheme.colorScheme.primary)
                                     Column(Modifier.weight(1f).padding(horizontal = 16.dp)) {
                                         Text(layout.displayName, style = MaterialTheme.typography.titleMedium)
-                                        Text("Include in toolbar cycle", style = MaterialTheme.typography.bodySmall)
+                                        Text(stringResource(R.string.include_in_cycle), style = MaterialTheme.typography.bodySmall)
                                     }
-                                    if (active) Icon(Icons.Default.Check, "Selected")
+                                    if (active) Icon(Icons.Default.Check, stringResource(R.string.cd_selected))
                                     Checkbox(
                                         checked = layout.name in cycleSelection,
                                         enabled = layout.name !in cycleSelection || cycleSelection.size > 1,

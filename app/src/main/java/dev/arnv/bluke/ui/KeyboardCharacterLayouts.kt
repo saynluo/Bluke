@@ -1,18 +1,21 @@
 package dev.arnv.bluke.ui
 
+import dev.arnv.bluke.R
+import androidx.annotation.StringRes
+
 const val KEYBOARD_CHARACTER_LAYOUT_PREFERENCE = "keyboard_character_layout"
 
 enum class KeyboardCharacterLayout(
     val preferenceValue: String,
     val displayName: String,
-    val hostLayoutName: String,
+    @StringRes val hostLayoutRes: Int,
 ) {
-    US_QWERTY("us_qwerty", "QWERTY", "English (US)"),
-    FRENCH_AZERTY("fr_azerty", "AZERTY", "French"),
-    GERMAN_QWERTZ("de_qwertz", "QWERTZ", "German"),
-    DVORAK("dvorak", "Dvorak", "Dvorak"),
-    COLEMAK("colemak", "Colemak", "Colemak"),
-    RUSSIAN_JCUKEN("ru_jcuken", "ЙЦУКЕН", "Russian");
+    US_QWERTY("us_qwerty", "QWERTY", R.string.host_layout_us),
+    FRENCH_AZERTY("fr_azerty", "AZERTY", R.string.host_layout_french),
+    GERMAN_QWERTZ("de_qwertz", "QWERTZ", R.string.host_layout_german),
+    DVORAK("dvorak", "Dvorak", R.string.host_layout_dvorak),
+    COLEMAK("colemak", "Colemak", R.string.host_layout_colemak),
+    RUSSIAN_JCUKEN("ru_jcuken", "ЙЦУКЕН", R.string.host_layout_russian);
 
     companion object {
         fun fromPreference(value: String?): KeyboardCharacterLayout =

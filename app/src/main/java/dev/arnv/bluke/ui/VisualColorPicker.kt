@@ -1,5 +1,7 @@
 package dev.arnv.bluke.ui
 
+import androidx.compose.ui.res.stringResource
+import dev.arnv.bluke.R
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -146,7 +148,7 @@ fun VisualColorPicker(
     }
 
     TextButton(onClick = { showPreciseInput = !showPreciseInput }) {
-        Text(if (showPreciseInput) "Hide precise value" else "Enter a precise hex value")
+        Text(if (showPreciseInput) stringResource(R.string.cd_hide_precise) else stringResource(R.string.cd_enter_hex))
     }
     if (showPreciseInput) {
         OutlinedTextField(
@@ -158,10 +160,10 @@ fun VisualColorPicker(
                 hexText = normalized
                 parseOpaqueHexColor(normalized)?.let(onColorChange)
             },
-            label = { Text("Hex color") },
+            label = { Text(stringResource(R.string.hex_color)) },
             singleLine = true,
             isError = parseOpaqueHexColor(hexText) == null,
-            supportingText = if (parseOpaqueHexColor(hexText) == null) ({ Text("Use #RRGGBB") }) else null,
+            supportingText = if (parseOpaqueHexColor(hexText) == null) ({ Text(stringResource(R.string.hex_color_hint)) }) else null,
             trailingIcon = {
                 Box(
                     Modifier

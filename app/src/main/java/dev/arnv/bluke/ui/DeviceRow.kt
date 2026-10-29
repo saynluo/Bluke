@@ -1,5 +1,9 @@
 package dev.arnv.bluke.ui
 
+import dev.arnv.bluke.R
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.annotation.StringRes
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothClass
@@ -25,20 +29,20 @@ import androidx.compose.ui.unit.sp
  */
 enum class DeviceType(
     val id: String,
-    val displayName: String,
+    @StringRes val labelRes: Int,
     val icon: androidx.compose.ui.graphics.vector.ImageVector,
     val bgColor: Color,
     val tintColor: Color,
     val isSupported: Boolean
 ) {
-    COMPUTER("computer", "Computer", Icons.Default.Laptop, Color(0xFFE8DDFF), Color(0xFF65558F), true),
-    PHONE("phone", "Phone", Icons.Default.PhoneAndroid, Color(0xFFD6F0FF), Color(0xFF006494), true),
-    TV("tv", "Smart TV", Icons.Default.Tv, Color(0xFFE0F7FA), Color(0xFF006064), true),
-    AUDIO("audio", "Audio Device", Icons.Default.Headphones, Color(0xFFFBE7E9), Color(0xFFC00021), false),
-    MOUSE("mouse", "Input Accessory", Icons.Default.Mouse, Color(0xFFFFD8E4), Color(0xFFB11E4C), false),
-    GAMEPAD("gamepad", "Game Controller", Icons.Default.SportsEsports, Color(0xFFFFE9A6), Color(0xFF7D5200), false),
-    WATCH("watch", "Smartwatch", Icons.Default.Watch, Color(0xFFF3EDF7), Color(0xFF65558F), false),
-    DEFAULT("default", "Bluetooth Device", Icons.Default.Bluetooth, Color(0xFFE2F1FF), Color(0xFF0F5A9E), true)
+    COMPUTER("computer", R.string.device_type_computer, Icons.Default.Laptop, Color(0xFFE8DDFF), Color(0xFF65558F), true),
+    PHONE("phone", R.string.device_type_phone, Icons.Default.PhoneAndroid, Color(0xFFD6F0FF), Color(0xFF006494), true),
+    TV("tv", R.string.device_type_tv, Icons.Default.Tv, Color(0xFFE0F7FA), Color(0xFF006064), true),
+    AUDIO("audio", R.string.device_type_audio, Icons.Default.Headphones, Color(0xFFFBE7E9), Color(0xFFC00021), false),
+    MOUSE("mouse", R.string.device_type_input, Icons.Default.Mouse, Color(0xFFFFD8E4), Color(0xFFB11E4C), false),
+    GAMEPAD("gamepad", R.string.device_type_gamepad, Icons.Default.SportsEsports, Color(0xFFFFE9A6), Color(0xFF7D5200), false),
+    WATCH("watch", R.string.device_type_watch, Icons.Default.Watch, Color(0xFFF3EDF7), Color(0xFF65558F), false),
+    DEFAULT("default", R.string.device_type_default, Icons.Default.Bluetooth, Color(0xFFE2F1FF), Color(0xFF0F5A9E), true)
 }
 
 /**
@@ -154,19 +158,14 @@ fun DeviceRow(
     device: BluetoothDevice? = null,
     onActionClick: () -> Unit
 ) {
-    val isError = statusText?.let { 
-        it.contains("Failed", ignoreCase = true) || 
-        it.contains("error", ignoreCase = true) || 
-        it.contains("reject", ignoreCase = true) ||
-        it.contains("timed out", ignoreCase = true) ||
-        it.contains("refused", ignoreCase = true)
-    } == true
-    val isWorking = (!isError && !isConnected && statusText?.let { 
-        it.contains("Connecting", ignoreCase = true) || 
-        it.contains("Pairing with", ignoreCase = true) ||
-        it.contains("Waiting for", ignoreCase = true) ||
-        it.contains("Switching to", ignoreCase = true)
-    } == true) || (isConnected && statusText?.contains("disconnect", ignoreCase = true) == true)
+    // Status text is the manager's localized message; keyword lists are translated alongside it.
+    val errorKeywords = stringArrayResource(R.array.status_error_keywords)
+    val workingKeywords = stringArrayResource(R.array.status_working_keywords)
+    val disconnectKeywords = stringArrayResource(R.array.status_disconnect_keywords)
+    fun String.mentionsAny(words: Array<String>) = words.any { contains(it, ignoreCase = true) }
+    val isError = statusText?.mentionsAny(errorKeywords) == true
+    val isWorking = (!isError && !isConnected && statusText?.mentionsAny(workingKeywords) == true) ||
+        (isConnected && statusText?.mentionsAny(disconnectKeywords) == true)
     
     // Categorize device to show specialized icons and capability badges
     val deviceType = classifyDevice(name, device)
@@ -183,7 +182,7 @@ fun DeviceRow(
         onClick = onActionClick,
         enabled = isConnected || isSupported,
         shape = shape,
-        color = if (isConnected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        color = if (isConnected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row(
@@ -211,7 +210,7 @@ fun DeviceRow(
                     } else {
                         Icon(
                             imageVector = deviceType.icon,
-                            contentDescription = deviceType.displayName,
+                            contentDescription = stringResource(deviceType.labelRes),
                             tint = if (isConnected) MaterialTheme.colorScheme.onPrimaryContainer else if (isError) MaterialTheme.colorScheme.error else deviceType.tintColor,
                             modifier = Modifier.size(20.dp)
                         )
@@ -223,8 +222,9 @@ fun DeviceRow(
                 Column {
                     Text(
                         text = name,
-                        fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.titleMedium,
+                        maxLines = 1,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                         color = if (isConnected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                     )
                     
@@ -253,7 +253,7 @@ fun DeviceRow(
                                         .padding(horizontal = 6.dp, vertical = 2.dp)
                                 ) {
                                     Text(
-                                        text = "UNSUPPORTED",
+                                        text = stringResource(R.string.device_tag_unsupported),
                                         style = MaterialTheme.typography.labelSmall,
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold,
@@ -271,7 +271,7 @@ fun DeviceRow(
                                         .padding(horizontal = 6.dp, vertical = 2.dp)
                                 ) {
                                     Text(
-                                        text = "FAILED",
+                                        text = stringResource(R.string.device_tag_failed),
                                         style = MaterialTheme.typography.labelSmall,
                                         fontSize = 9.sp,
                                         fontWeight = FontWeight.Bold,
@@ -322,8 +322,7 @@ fun DeviceRow(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = if (isConnected) "Disconnect" 
-                           else "Connect",
+                    text = stringResource(if (isConnected) R.string.action_disconnect else R.string.action_connect),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.labelLarge
                 )

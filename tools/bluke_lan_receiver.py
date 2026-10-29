@@ -2,17 +2,23 @@
 """Bluke LAN receiver: turns HID reports streamed by the Bluke app over Wi-Fi into local input.
 
 Usage:  pip install pynput
-        python bluke_lan_receiver.py <phone-ip> <pin>
+        python bluke_lan_receiver.py
 
+Then open Bluke on the phone, scan under "LAN", pick this computer and enter the PIN printed here.
 Supports keyboard, touchpad/mouse and media keys. Gamepad mode is Bluetooth-only.
 """
+import os
+import secrets
 import socket
-import sys
+import threading
+import time
 
 from pynput.keyboard import Controller as Keyboard, Key, KeyCode
 from pynput.mouse import Button, Controller as Mouse
 
 PORT = 7393
+DISCOVERY_PORT = 7394
+PIN_FILE = os.path.join(os.path.expanduser("~"), ".bluke_receiver_pin")
 
 MODIFIERS = [Key.ctrl_l, Key.shift_l, Key.alt_l, Key.cmd_l, Key.ctrl_r, Key.shift_r, Key.alt_r, Key.cmd_r]
 
@@ -100,31 +106,83 @@ def read_exact(sock, n):
     return buf
 
 
-def main():
-    if len(sys.argv) != 3:
-        sys.exit(__doc__)
-    host, pin = sys.argv[1], sys.argv[2]
-    sock = socket.create_connection((host, PORT), timeout=5)
-    sock.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-    sock.sendall(f"BLUKE {pin}\n".encode())
-    if read_exact(sock, 3) != b"OK\n":
-        sys.exit("Handshake rejected")
-    sock.settimeout(None)
-    print(f"Connected to {host}. Ctrl+C to quit.")
+def load_pin():
+    """Keep one PIN across runs so the phone can reconnect without retyping it."""
+    try:
+        with open(PIN_FILE) as f:
+            pin = f.read().strip()
+        if len(pin) == 6 and pin.isdigit():
+            return pin
+    except OSError:
+        pass
+    pin = f"{secrets.randbelow(1_000_000):06d}"
+    with open(PIN_FILE, "w") as f:
+        f.write(pin)
+    return pin
+
+
+def answer_discovery(name):
+    udp = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    udp.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    udp.bind(("", DISCOVERY_PORT))
+    reply = f"BLUKE! {name}".encode()
+    while True:
+        data, addr = udp.recvfrom(64)
+        if data == b"BLUKE?":
+            udp.sendto(reply, addr)
+
+
+def serve_phone(conn, pin):
+    """Authenticate one phone, then inject its reports until it disconnects."""
+    conn.settimeout(5)
+    hello = b""
+    while not hello.endswith(b"\n") and len(hello) < 64:
+        hello += read_exact(conn, 1)
+    if hello != f"BLUKE {pin}\n".encode():
+        conn.sendall(b"NO\n")
+        time.sleep(1)  # Throttle PIN guessing; phones are served one at a time.
+        return
+    conn.sendall(b"OK\n")
+    conn.settimeout(None)
+    conn.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
     inj = Injector()
     handlers = {1: inj.keyboard, 2: inj.pointer, 4: inj.media}
+    print("Phone connected.")
     try:
         while True:
-            length = read_exact(sock, 1)[0]
-            frame = read_exact(sock, length)
+            length = read_exact(conn, 1)[0]
+            frame = read_exact(conn, length)
             handler = handlers.get(frame[0])
             if handler:
                 handler(frame[1:])
-    except (ConnectionError, KeyboardInterrupt) as e:
-        print(e or "Bye")
     finally:
         inj.release_all()
-        sock.close()
+        print("Phone disconnected.")
+
+
+def main():
+    pin = load_pin()
+    name = socket.gethostname()
+    threading.Thread(target=answer_discovery, args=(name,), daemon=True).start()
+    server = socket.socket()
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind(("", PORT))
+    server.listen(1)
+    server.settimeout(1)  # Wake periodically so Ctrl+C works on Windows.
+    print(f"Bluke receiver \"{name}\" is ready.  PIN: {pin}   (Ctrl+C to quit)")
+    try:
+        while True:
+            try:
+                conn, _ = server.accept()
+            except socket.timeout:
+                continue
+            with conn:
+                try:
+                    serve_phone(conn, pin)
+                except (ConnectionError, OSError):
+                    pass
+    except KeyboardInterrupt:
+        print("Bye")
 
 
 if __name__ == "__main__":

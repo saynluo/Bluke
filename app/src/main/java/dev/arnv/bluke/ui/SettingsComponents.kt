@@ -1,12 +1,15 @@
 package dev.arnv.bluke.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 
 data class SettingsItemData(
@@ -24,12 +27,7 @@ fun SettingsCardGroup(
 ) {
     Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
         if (title != null) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(start = 16.dp, bottom = 8.dp, top = 24.dp)
-            )
+            SettingsSectionHeader(title, Modifier.padding(start = 16.dp, bottom = 8.dp, top = 8.dp))
         }
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             items.forEachIndexed { index, item ->
@@ -42,25 +40,20 @@ fun SettingsCardGroup(
                         bottomStart = bottomRadius,
                         bottomEnd = bottomRadius
                     ),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     val modifier = if (item.onClick != null) {
                         Modifier.clickable { item.onClick.invoke() }
                     } else Modifier
                     
-                    val paddingVertical = if (item.subtitle == null && item.icon == null) 12.dp else 20.dp
+                    val paddingVertical = if (item.subtitle == null && item.icon == null) 12.dp else 16.dp
                     Row(
-                        modifier = modifier.padding(horizontal = 24.dp, vertical = paddingVertical),
+                        modifier = modifier.padding(horizontal = 20.dp, vertical = paddingVertical),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (item.icon != null) {
-                            Box(
-                                modifier = Modifier.padding(end = 16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                item.icon.invoke()
-                            }
+                            SettingsIconBadge(item.icon)
                         }
                         Column(modifier = Modifier.weight(1f)) {
                             Text(text = item.title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
@@ -93,19 +86,14 @@ fun SettingsGroup(
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         if (title != null) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(start = 32.dp, bottom = 8.dp, top = 24.dp)
-            )
+            SettingsSectionHeader(title, Modifier.padding(start = 32.dp, bottom = 8.dp, top = 8.dp))
         }
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            color = MaterialTheme.colorScheme.surfaceContainerHigh
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
@@ -131,12 +119,7 @@ fun SettingsItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
-            Box(
-                modifier = Modifier.padding(end = 16.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                icon()
-            }
+            SettingsIconBadge(icon)
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(text = title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
@@ -153,5 +136,30 @@ fun SettingsItem(
                 action()
             }
         }
+    }
+}
+
+@Composable
+fun SettingsSectionHeader(title: String, modifier: Modifier = Modifier) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = modifier
+    )
+}
+
+/** Tonal circle behind settings icons; icons keep the tint their caller gives them. */
+@Composable
+private fun SettingsIconBadge(icon: @Composable () -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(end = 16.dp)
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)),
+        contentAlignment = Alignment.Center
+    ) {
+        icon()
     }
 }

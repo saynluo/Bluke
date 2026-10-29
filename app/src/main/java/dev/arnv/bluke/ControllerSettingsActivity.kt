@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -52,9 +53,9 @@ class ControllerSettingsActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Controller") },
+                            title = { Text(stringResource(R.string.controller_settings_title)) },
                             navigationIcon = {
-                                IconButton(onClick = ::finish) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") }
+                                IconButton(onClick = ::finish) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.cd_back)) }
                             },
                             scrollBehavior = scrollBehavior,
                         )
@@ -66,11 +67,11 @@ class ControllerSettingsActivity : ComponentActivity() {
                     ) {
                         Spacer(Modifier.height(8.dp))
                         SettingsCardGroup(
-                            title = "Behaviour",
+                            title = stringResource(R.string.behavior_section),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Controller compatibility",
-                                    subtitle = dpadMode.description,
+                                    title = stringResource(R.string.controller_compat_title),
+                                    subtitle = stringResource(dpadMode.descriptionRes),
                                     icon = { Icon(Icons.Default.Gamepad, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { showDialog = true },
                                 ),
@@ -80,9 +81,9 @@ class ControllerSettingsActivity : ComponentActivity() {
                 }
                 if (showDialog) {
                     ChoiceDialog(
-                        title = "Controller compatibility",
-                        explanation = "Use Native for Windows/Linux games, Android for games on Android, or Web when a browser game ignores directions. All modes switch live without reconnecting. After updating to the shared controller descriptor, forget both devices and pair again once. Games may not support Share or touchpad-click.",
-                        choices = GamepadDpadOutputMode.entries.map { it.label },
+                        title = stringResource(R.string.controller_compat_title),
+                        explanation = stringResource(R.string.controller_compat_explanation),
+                        choices = GamepadDpadOutputMode.entries.map { stringResource(it.labelRes) },
                         selectedIndex = dpadMode.ordinal,
                         onSelect = { index ->
                             dpadMode = GamepadDpadOutputMode.entries[index]

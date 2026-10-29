@@ -208,9 +208,9 @@ fun OnboardingScreen(
                     }
 
                     val buttonText = when (pagerState.currentPage) {
-                        0 -> "Let's Start"
-                        1 -> if (permissionsGranted) "Continue" else "Grant Permissions"
-                        else -> if (timer > 0) "Let's go (${timer}s)" else "Let's go"
+                        0 -> stringResource(R.string.onboarding_start)
+                        1 -> if (permissionsGranted) stringResource(R.string.action_continue) else stringResource(R.string.onboarding_grant)
+                        else -> if (timer > 0) stringResource(R.string.onboarding_go_timer, timer) else stringResource(R.string.onboarding_go)
                     }
                     val isEnabled = when (pagerState.currentPage) {
                         0 -> true
@@ -292,7 +292,7 @@ fun WelcomePage() {
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            "Turn your Android device into a completely wireless Bluetooth keyboard for your PC, Mac, or Smart TV.",
+            stringResource(R.string.onboarding_tagline),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -318,14 +318,14 @@ fun PermissionsPage(isGranted: Boolean, attempts: Int, openSettings: () -> Unit)
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            "Permissions Needed",
+            stringResource(R.string.onboarding_permissions_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
         Spacer(Modifier.height(16.dp))
         Text(
-            "To act as a keyboard and connect to your devices, we need the following permissions.",
+            stringResource(R.string.onboarding_permissions_body),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -337,7 +337,7 @@ fun PermissionsPage(isGranted: Boolean, attempts: Int, openSettings: () -> Unit)
         ) {
             // Bluetooth Permission item
             Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp, bottomStart = 4.dp, bottomEnd = 4.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -345,8 +345,8 @@ fun PermissionsPage(isGranted: Boolean, attempts: Int, openSettings: () -> Unit)
                     Icon(Icons.Default.Bluetooth, null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Bluetooth", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                        Text("Connect to devices as a keyboard.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.mode_bluetooth), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.onboarding_bt_perm), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (hasBluetooth) {
                         Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary)
@@ -356,7 +356,7 @@ fun PermissionsPage(isGranted: Boolean, attempts: Int, openSettings: () -> Unit)
 
             // Location Permission item
             Surface(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                color = MaterialTheme.colorScheme.surfaceContainerHigh,
                 shape = RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp, bottomStart = 28.dp, bottomEnd = 28.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -364,8 +364,8 @@ fun PermissionsPage(isGranted: Boolean, attempts: Int, openSettings: () -> Unit)
                     Icon(Icons.Default.LocationOn, null, tint = MaterialTheme.colorScheme.primary)
                     Spacer(Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Location", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
-                        Text("Required by Android to scan for Bluetooth devices.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.onboarding_location), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                        Text(stringResource(R.string.onboarding_location_perm), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     if (hasLocation) {
                         Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.primary)
@@ -385,7 +385,7 @@ fun PermissionsPage(isGranted: Boolean, attempts: Int, openSettings: () -> Unit)
                     Row(Modifier.padding(16.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Check, null, tint = MaterialTheme.colorScheme.onTertiaryContainer)
                         Spacer(Modifier.width(16.dp))
-                        Text("All permissions granted!", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onTertiaryContainer)
+                        Text(stringResource(R.string.onboarding_all_granted), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onTertiaryContainer)
                     }
                 }
             } else if (attempts > 0) {
@@ -397,13 +397,13 @@ fun PermissionsPage(isGranted: Boolean, attempts: Int, openSettings: () -> Unit)
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Warning, null, tint = MaterialTheme.colorScheme.onErrorContainer)
                             Spacer(Modifier.width(16.dp))
-                            Text("Permissions missing", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer)
+                            Text(stringResource(R.string.onboarding_missing), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer)
                         }
                         Spacer(Modifier.height(8.dp))
-                        Text("If you denied prompts, you might need to enable them in settings.", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
+                        Text(stringResource(R.string.onboarding_missing_body), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
                         Spacer(Modifier.height(8.dp))
                         TextButton(onClick = openSettings) {
-                            Text("Open Settings", color = MaterialTheme.colorScheme.onErrorContainer)
+                            Text(stringResource(R.string.action_open_settings), color = MaterialTheme.colorScheme.onErrorContainer)
                         }
                     }
                 }
@@ -422,7 +422,7 @@ fun ConnectionGuidePage() {
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            "How to Connect",
+            stringResource(R.string.onboarding_how_title),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -431,21 +431,21 @@ fun ConnectionGuidePage() {
 
         StepSection(
             icon = Icons.Default.Bluetooth, 
-            title = "New Device",
+            title = stringResource(R.string.onboarding_new_device),
             steps = listOf(
-                "Scan for devices from this App.",
-                "Tap 'Connect' on your target PC or TV.",
-                "Accept the pairing prompt on BOTH devices."
+                stringResource(R.string.onboarding_new_1),
+                stringResource(R.string.onboarding_new_2),
+                stringResource(R.string.onboarding_new_3)
             )
         )
         Spacer(Modifier.height(24.dp))
         StepSection(
             icon = Icons.Default.BluetoothConnected, 
-            title = "Existing Device",
+            title = stringResource(R.string.onboarding_existing),
             steps = listOf(
-                "Locate your device under 'Paired Devices'.",
-                "Tap 'Connect'.",
-                "If connection fails, unpair on both devices and retry."
+                stringResource(R.string.onboarding_existing_1),
+                stringResource(R.string.onboarding_existing_2),
+                stringResource(R.string.onboarding_existing_3)
             )
         )
         Spacer(Modifier.height(80.dp))

@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -39,8 +40,8 @@ class BehaviorActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Controls & connection") },
-                            navigationIcon = { IconButton(onClick = ::finish) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                            title = { Text(stringResource(R.string.settings_group_controls)) },
+                            navigationIcon = { IconButton(onClick = ::finish) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.cd_back)) } },
                             scrollBehavior = scrollBehavior,
                         )
                     },
@@ -51,14 +52,14 @@ class BehaviorActivity : ComponentActivity() {
                     ) {
                         Spacer(Modifier.height(8.dp))
                         SettingsCardGroup(
-                            title = "Behaviour",
+                            title = stringResource(R.string.behavior_section),
                             items = listOf(
-                                SettingsItemData("Reconnect on launch", "Try the most recently connected host when Bluetooth is ready", { Icon(Icons.Default.BluetoothConnected, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(reconnect, { reconnect = it; preferences.edit { putBoolean("auto_connect", it) } }) }),
-                                SettingsItemData("Hide unnamed devices", "Do not show scan results without a device name", { Icon(Icons.Default.Warning, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(hideUnknown, { hideUnknown = it; preferences.edit { putBoolean("hide_unknown", it) } }) }),
-                                SettingsItemData("Hide unlikely hosts", "Filter devices that do not appear able to accept input", { Icon(Icons.Default.FilterAltOff, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(hideUnlikely, { hideUnlikely = it; preferences.edit { putBoolean("hide_unsupported", it) } }) }),
-                                SettingsItemData("Show MAC addresses", "Useful when similarly named Bluetooth devices are nearby", { Icon(Icons.Default.Fingerprint, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(showMac, { showMac = it; preferences.edit { putBoolean("show_mac", it) } }) }),
-                                SettingsItemData("Keep audio on this phone", "Best-effort workaround when a host takes over phone audio", { Icon(Icons.Default.MusicNote, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(keepAudio, { keepAudio = it; preferences.edit { putBoolean("disconnect_audio_profiles", it) } }) }),
-                                SettingsItemData("Volume buttons control host volume", "Only while Multimedia is open", { Icon(Icons.AutoMirrored.Filled.VolumeUp, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(volumeControlsHost, { volumeControlsHost = it; preferences.edit { putBoolean(HARDWARE_VOLUME_REMOTE_PREFERENCE, it) } }) }),
+                                SettingsItemData(stringResource(R.string.behavior_reconnect), stringResource(R.string.behavior_reconnect_sub), { Icon(Icons.Default.BluetoothConnected, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(reconnect, { reconnect = it; preferences.edit { putBoolean("auto_connect", it) } }) }),
+                                SettingsItemData(stringResource(R.string.behavior_hide_unnamed), stringResource(R.string.behavior_hide_unnamed_sub), { Icon(Icons.Default.Warning, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(hideUnknown, { hideUnknown = it; preferences.edit { putBoolean("hide_unknown", it) } }) }),
+                                SettingsItemData(stringResource(R.string.behavior_hide_unlikely), stringResource(R.string.behavior_hide_unlikely_sub), { Icon(Icons.Default.FilterAltOff, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(hideUnlikely, { hideUnlikely = it; preferences.edit { putBoolean("hide_unsupported", it) } }) }),
+                                SettingsItemData(stringResource(R.string.behavior_show_mac), stringResource(R.string.behavior_show_mac_sub), { Icon(Icons.Default.Fingerprint, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(showMac, { showMac = it; preferences.edit { putBoolean("show_mac", it) } }) }),
+                                SettingsItemData(stringResource(R.string.behavior_keep_audio), stringResource(R.string.behavior_keep_audio_sub), { Icon(Icons.Default.MusicNote, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(keepAudio, { keepAudio = it; preferences.edit { putBoolean("disconnect_audio_profiles", it) } }) }),
+                                SettingsItemData(stringResource(R.string.behavior_volume_keys), stringResource(R.string.behavior_volume_keys_sub), { Icon(Icons.AutoMirrored.Filled.VolumeUp, null, tint = MaterialTheme.colorScheme.primary) }, { Switch(volumeControlsHost, { volumeControlsHost = it; preferences.edit { putBoolean(HARDWARE_VOLUME_REMOTE_PREFERENCE, it) } }) }),
                             ),
                         )
                         Spacer(Modifier.height(32.dp))

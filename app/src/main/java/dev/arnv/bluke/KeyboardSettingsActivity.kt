@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -66,10 +67,10 @@ class KeyboardSettingsActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Keyboard") },
+                            title = { Text(stringResource(R.string.keyboard_settings_title)) },
                             navigationIcon = {
                                 IconButton(onClick = ::finish) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                 }
                             },
                             scrollBehavior = scrollBehavior,
@@ -81,11 +82,11 @@ class KeyboardSettingsActivity : ComponentActivity() {
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         Spacer(Modifier.height(8.dp))
-                        SettingsGroup(title = "Behaviour") {
+                        SettingsGroup(title = stringResource(R.string.behavior_section)) {
                             Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)) {
-                                Text("Key touch area", style = MaterialTheme.typography.titleMedium)
+                                Text(stringResource(R.string.key_touch_area), style = MaterialTheme.typography.titleMedium)
                                 Text(
-                                    "Broader values make keys easier to hit but can increase adjacent-key presses.",
+                                    stringResource(R.string.key_touch_area_sub),
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -99,7 +100,7 @@ class KeyboardSettingsActivity : ComponentActivity() {
                                     steps = 9,
                                 )
                                 Text(
-                                    if (keySensitivity <= 3f) "Precise" else if (keySensitivity >= 8f) "Broad" else "Balanced",
+                                    if (keySensitivity <= 3f) stringResource(R.string.touch_precise) else if (keySensitivity >= 8f) stringResource(R.string.touch_broad) else stringResource(R.string.touch_balanced),
                                     style = MaterialTheme.typography.labelLarge,
                                     color = MaterialTheme.colorScheme.primary,
                                 )
@@ -108,37 +109,37 @@ class KeyboardSettingsActivity : ComponentActivity() {
                         SettingsCardGroup(
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Typing layout",
-                                    subtitle = "${characterLayout.displayName} · host: ${characterLayout.hostLayoutName}",
+                                    title = stringResource(R.string.typing_layout),
+                                    subtitle = stringResource(R.string.typing_layout_subtitle, characterLayout.displayName, stringResource(characterLayout.hostLayoutRes)),
                                     icon = { Icon(Icons.Default.Keyboard, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { dialog = KeyboardDialog.TYPING_LAYOUT },
                                 ),
                                 SettingsItemData(
-                                    title = "Caps Lock",
-                                    subtitle = if (lockSyncMode == "host") "Follow host indicators" else "Track locally on this phone",
+                                    title = stringResource(R.string.caps_lock),
+                                    subtitle = if (lockSyncMode == "host") stringResource(R.string.caps_follow_host) else stringResource(R.string.caps_track_local),
                                     icon = { Icon(Icons.Default.Settings, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { dialog = KeyboardDialog.CAPS_LOCK },
                                 ),
                             ),
                         )
                         SettingsCardGroup(
-                            title = "Customization",
+                            title = stringResource(R.string.customization),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Layouts",
-                                    subtitle = "Choose a layout and toolbar cycle choices",
+                                    title = stringResource(R.string.layouts),
+                                    subtitle = stringResource(R.string.layouts_sub),
                                     icon = { Icon(Icons.Default.Keyboard, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { startActivity(Intent(this@KeyboardSettingsActivity, KeyboardLayoutsActivity::class.java)) },
                                 ),
                                 SettingsItemData(
-                                    title = "Themes",
-                                    subtitle = "Keyboard colors, case, and toolbar cycle choices",
+                                    title = stringResource(R.string.themes),
+                                    subtitle = stringResource(R.string.themes_sub),
                                     icon = { Icon(Icons.Default.Palette, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { startActivity(Intent(this@KeyboardSettingsActivity, KeyboardThemesActivity::class.java)) },
                                 ),
                                 SettingsItemData(
-                                    title = "Key sound packs",
-                                    subtitle = "Choose, import, and configure toolbar cycle choices",
+                                    title = stringResource(R.string.sound_packs),
+                                    subtitle = stringResource(R.string.sound_packs_sub),
                                     icon = { Icon(Icons.Default.GraphicEq, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { startActivity(Intent(this@KeyboardSettingsActivity, SoundPacksActivity::class.java)) },
                                 ),
@@ -150,8 +151,8 @@ class KeyboardSettingsActivity : ComponentActivity() {
 
                 when (dialog) {
                     KeyboardDialog.TYPING_LAYOUT -> ChoiceDialog(
-                        title = "Typing layout",
-                        explanation = "Select the matching input source on the host so punctuation and symbols agree.",
+                        title = stringResource(R.string.typing_layout),
+                        explanation = stringResource(R.string.typing_layout_explanation),
                         choices = KeyboardCharacterLayout.entries.map { it.displayName },
                         selectedIndex = KeyboardCharacterLayout.entries.indexOf(characterLayout),
                         onSelect = { index ->
@@ -162,9 +163,9 @@ class KeyboardSettingsActivity : ComponentActivity() {
                         onDismiss = { dialog = null },
                     )
                     KeyboardDialog.CAPS_LOCK -> ChoiceDialog(
-                        title = "Caps Lock",
-                        explanation = "Choose where lock-key state is controlled.",
-                        choices = listOf("Host controlled", "Local on this phone"),
+                        title = stringResource(R.string.caps_lock),
+                        explanation = stringResource(R.string.caps_lock_explanation),
+                        choices = listOf(stringResource(R.string.caps_host_controlled), stringResource(R.string.caps_local)),
                         selectedIndex = if (lockSyncMode == "host") 0 else 1,
                         onSelect = { index ->
                             lockSyncMode = if (index == 0) "host" else "device"
@@ -210,6 +211,6 @@ internal fun ChoiceDialog(
                 }
             }
         },
-        confirmButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
+        confirmButton = { TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) } },
     )
 }

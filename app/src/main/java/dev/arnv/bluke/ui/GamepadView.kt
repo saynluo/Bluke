@@ -1,5 +1,6 @@
 package dev.arnv.bluke.ui
 
+import androidx.compose.ui.res.stringResource
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
@@ -427,13 +428,13 @@ fun GamepadView(
     if (!modeSwitchBusy && modeSwitchError != null) {
         AlertDialog(
             onDismissRequest = { btManager.dismissGamepadModeSwitchError() },
-            title = { Text("Controller mode change interrupted") },
+            title = { Text(stringResource(R.string.gamepad_switch_interrupted_title)) },
             text = { Text(modeSwitchError.orEmpty()) },
             confirmButton = {
-                TextButton(onClick = { btManager.retryGamepadModeSwitch() }) { Text("Retry") }
+                TextButton(onClick = { btManager.retryGamepadModeSwitch() }) { Text(stringResource(R.string.action_retry)) }
             },
             dismissButton = {
-                TextButton(onClick = { btManager.dismissGamepadModeSwitchError() }) { Text("Close") }
+                TextButton(onClick = { btManager.dismissGamepadModeSwitchError() }) { Text(stringResource(R.string.action_close)) }
             },
         )
     }
@@ -454,7 +455,7 @@ fun GamepadView(
                     CircularProgressIndicator()
                     Text(
                         if (modeSwitchState == GamepadModeSwitchState.REGISTERING)
-                            "Changing controller mode…" else "Reconnecting to device…",
+                            stringResource(R.string.gamepad_switching_mode) else stringResource(R.string.gamepad_reconnecting),
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
                     )
@@ -463,7 +464,7 @@ fun GamepadView(
         }
     }
     val isConnected = connectedDevNow != null
-    val deviceName = (connectedDevNow ?: btManager.getReconnectTarget())?.name ?: "No Host"
+    val deviceName = (connectedDevNow ?: btManager.getReconnectTarget())?.name ?: stringResource(R.string.no_host)
 
     var buttonMask by remember { mutableIntStateOf(0) }
     var dpadMask by remember { mutableIntStateOf(0) }
@@ -585,9 +586,9 @@ fun GamepadView(
                             .testTag("exit_gamepad_btn"),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Close, "Exit", tint = Color.White, modifier = Modifier.size(10.dp))
+                        Icon(Icons.Default.Close, stringResource(R.string.cd_exit), tint = Color.White, modifier = Modifier.size(10.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("Close", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.action_close), color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     }
 
                     // Mode cycle
@@ -597,8 +598,8 @@ fun GamepadView(
                             .clip(RoundedCornerShape(6.dp))
                             .background(Color.White.copy(alpha = 0.15f))
                             .combinedClickable(
-                                onClickLabel = "Next input mode",
-                                onLongClickLabel = "Configure input mode cycle",
+                                onClickLabel = stringResource(R.string.cd_next_input_mode),
+                                onLongClickLabel = stringResource(R.string.cd_configure_input_cycle),
                                 onClick = {
                                     val enabledModes = sharedPrefs.enabledInputModes().map(InputMode::id)
                                     val idx = enabledModes.indexOf(launchMode)
@@ -614,8 +615,8 @@ fun GamepadView(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Icon(Icons.Default.SportsEsports, "Switch Mode", tint = Color.White, modifier = Modifier.size(11.dp))
-                        Text("Gamepad Mode", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        Icon(Icons.Default.SportsEsports, stringResource(R.string.cd_switch_mode), tint = Color.White, modifier = Modifier.size(11.dp))
+                        Text(stringResource(R.string.gamepad_mode), color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     }
 
                     // Connection status
@@ -637,8 +638,8 @@ fun GamepadView(
                             .background(Color.White.copy(alpha = 0.15f))
                             .combinedClickable(
                                 enabled = !modeSwitchBusy,
-                                onClickLabel = "Switch controller compatibility",
-                                onLongClickLabel = "Configure controller compatibility",
+                                onClickLabel = stringResource(R.string.cd_switch_compat),
+                                onLongClickLabel = stringResource(R.string.cd_configure_compat),
                                 onClick = {
                                     val newMode = dpadOutputMode.next()
                                     if (btManager.changeGamepadMode(newMode)) triggerVibration(15)
@@ -663,7 +664,7 @@ fun GamepadView(
                             modifier = Modifier.size(11.dp)
                         )
                         Text(
-                            text = "Mode: ${dpadOutputMode.label}",
+                            text = stringResource(R.string.gamepad_mode_label, stringResource(dpadOutputMode.labelRes)),
                             color = Color.White,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
@@ -683,8 +684,8 @@ fun GamepadView(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Icon(Icons.Default.Refresh, "Reset Defaults", tint = Color.White, modifier = Modifier.size(11.dp))
-                            Text("Reset Defaults", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                            Icon(Icons.Default.Refresh, stringResource(R.string.reset_defaults), tint = Color.White, modifier = Modifier.size(11.dp))
+                            Text(stringResource(R.string.reset_defaults), color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                         }
                     }
 
@@ -705,12 +706,12 @@ fun GamepadView(
                     ) {
                         Icon(
                             imageVector = if (isEditMode) Icons.Default.Check else Icons.Default.Edit,
-                            contentDescription = "Edit Layout",
+                            contentDescription = stringResource(R.string.edit_layout),
                             tint = Color.White,
                             modifier = Modifier.size(12.dp)
                         )
                         Text(
-                            text = if (isEditMode) "Done" else "Edit Layout",
+                            text = if (isEditMode) stringResource(R.string.action_done) else stringResource(R.string.edit_layout),
                             color = Color.White,
                             fontSize = 9.sp,
                             fontWeight = FontWeight.Bold
@@ -731,7 +732,7 @@ fun GamepadView(
                             .testTag("console_selector_pill"),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.SportsEsports, "Consoles", tint = Color.White, modifier = Modifier.size(11.dp))
+                        Icon(Icons.Default.SportsEsports, stringResource(R.string.cd_consoles), tint = Color.White, modifier = Modifier.size(11.dp))
                         Spacer(Modifier.width(4.dp))
                         Text(config.name, color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                     }
@@ -752,9 +753,9 @@ fun GamepadView(
                         contentAlignment = Alignment.Center
                     ) {
                         if (isVibrationEnabled) {
-                            Icon(Icons.Default.Vibration, "Haptics", tint = Color.White, modifier = Modifier.size(12.dp))
+                            Icon(Icons.Default.Vibration, stringResource(R.string.haptics), tint = Color.White, modifier = Modifier.size(12.dp))
                         } else {
-                            Icon(painterResource(R.drawable.ic_vibration_off), "Haptics", tint = Color.White, modifier = Modifier.size(12.dp))
+                            Icon(painterResource(R.drawable.ic_vibration_off), stringResource(R.string.haptics), tint = Color.White, modifier = Modifier.size(12.dp))
                         }
                     }
                 }
@@ -2933,7 +2934,7 @@ private fun EditableComponentWrapper(
             ) {
                 Icon(
                     imageVector = Icons.Default.OpenInFull,
-                    contentDescription = "Resize",
+                    contentDescription = stringResource(R.string.cd_resize),
                     tint = Color.White,
                     modifier = Modifier.size(11.dp)
                 )

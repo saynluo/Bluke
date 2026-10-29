@@ -1,5 +1,7 @@
 package dev.arnv.bluke.ui
 
+import dev.arnv.bluke.R
+import androidx.annotation.StringRes
 import android.content.SharedPreferences
 import androidx.core.content.edit
 
@@ -8,12 +10,12 @@ private const val INPUT_MODE_CYCLE_PREFERENCE = "cycle_connection_modes"
 enum class InputMode(
     val id: Int,
     val preferenceKey: String,
-    val displayName: String,
+    @StringRes val labelRes: Int,
 ) {
-    KEYBOARD(0, "keyboard", "Keyboard"),
-    TOUCHPAD(1, "touchpad", "Touchpad"),
-    GAMEPAD(2, "gamepad", "Gamepad"),
-    MEDIA_PRESENTATION(4, "media_presentation", "Multimedia"),
+    KEYBOARD(0, "keyboard", R.string.input_mode_keyboard),
+    TOUCHPAD(1, "touchpad", R.string.input_mode_touchpad),
+    GAMEPAD(2, "gamepad", R.string.input_mode_gamepad),
+    MEDIA_PRESENTATION(4, "media_presentation", R.string.input_mode_media),
     ;
 
     companion object {

@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Bluetooth
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Warning
@@ -53,11 +55,11 @@ class HelpActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("Help & Guide") },
+                            title = { Text(stringResource(R.string.help_guide_title)) },
                             navigationIcon = {
                                 if (!isFirstRun || timer == 0) {
                                     IconButton(onClick = { finish() }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                     }
                                 }
                             },
@@ -82,7 +84,7 @@ class HelpActivity : ComponentActivity() {
                                         .fillMaxWidth()
                                         .padding(16.dp)
                                 ) {
-                                    Text(if (timer > 0) "I Understand ($timer)" else "I Understand")
+                                    Text(if (timer > 0) stringResource(R.string.help_understand_timer, timer) else stringResource(R.string.help_understand))
                                 }
                             }
                         }
@@ -99,58 +101,69 @@ class HelpActivity : ComponentActivity() {
                     ) {
                         
                         StepSection(
-                            icon = Icons.Default.Bluetooth, 
-                            title = "Connect a new host",
+                            icon = Icons.Default.Wifi,
+                            title = stringResource(R.string.help_lan),
                             steps = listOf(
-                                "Make the computer, TV, tablet, or phone visible in its Bluetooth settings.",
-                                "Scan in Bluke and tap the host name.",
-                                "Accept the matching pairing prompt on both devices.",
-                                "Wait for Bluke's status dot to turn green before sending input."
+                                stringResource(R.string.help_lan_1),
+                                stringResource(R.string.help_lan_2),
+                                stringResource(R.string.help_lan_3),
+                                stringResource(R.string.help_lan_4),
+                            )
+                        )
+
+                        StepSection(
+                            icon = Icons.Default.Bluetooth,  
+                            title = stringResource(R.string.help_new_host),
+                            steps = listOf(
+                                stringResource(R.string.help_new_host_1),
+                                stringResource(R.string.help_new_host_2),
+                                stringResource(R.string.help_new_host_3),
+                                stringResource(R.string.help_new_host_4)
                             )
                         )
                         
                         StepSection(
                             icon = Icons.Default.BluetoothConnected, 
-                            title = "Repair a stale pairing",
+                            title = stringResource(R.string.help_repair),
                             steps = listOf(
-                                "Forget the host in this phone's Bluetooth settings.",
-                                "Remove Bluke or this phone from the host's Bluetooth settings.",
-                                "Toggle Bluetooth on both sides, then pair again from Bluke.",
-                                "Reinstalling Bluke alone does not clear the host's cached HID layout."
+                                stringResource(R.string.help_repair_1),
+                                stringResource(R.string.help_repair_2),
+                                stringResource(R.string.help_repair_3),
+                                stringResource(R.string.help_repair_4)
                             )
                         )
                         
                         StepSection(
                             icon = Icons.Default.Warning, 
-                            title = "Pairing was refused",
+                            title = stringResource(R.string.help_refused),
                             isWarning = true,
                             steps = listOf(
-                                "A refusal means the host or phone rejected the request; it does not prove HID is unsupported.",
-                                "Retry once and accept every prompt on both devices.",
-                                "If it repeats, use the full repair steps above."
+                                stringResource(R.string.help_refused_1),
+                                stringResource(R.string.help_refused_2),
+                                stringResource(R.string.help_refused_3)
                             )
                         )
 
                         StepSection(
                             icon = Icons.Default.ErrorOutline, 
-                            title = "Controller and browser games",
+                            title = stringResource(R.string.help_controller),
                             isWarning = true,
                             steps = listOf(
-                                "Choose Native for Windows/Linux games, Android for Android games, or Web when a browser game ignores directions.",
-                                "Tap the controller mode button to cycle Native / Android / Web. Hold it to open Controller compatibility settings. All modes switch live without reconnecting. After updating to the shared controller descriptor, forget both devices and pair again once; subsequent mode switches need no re-pairing.",
-                                "For Steam, enable the controller in Steam Input and verify it in Steam's controller test or the operating system's game-controller panel.",
-                                "Bluke is a generic HID gamepad, not an Xbox XInput device. Some newer Windows games accept only XInput without a compatibility layer."
+                                stringResource(R.string.help_controller_1),
+                                stringResource(R.string.help_controller_2),
+                                stringResource(R.string.help_controller_3),
+                                stringResource(R.string.help_controller_4)
                             )
                         )
 
                         StepSection(
                             icon = Icons.Default.Warning,
-                            title = "Platform limitations",
+                            title = stringResource(R.string.help_limits),
                             steps = listOf(
-                                "Support depends on the phone firmware exposing Android's Bluetooth HID Device role.",
-                                "Apple hosts may pair but can restrict composite keyboard, pointer, or gamepad functions; behavior varies by iOS/iPadOS release.",
-                                "Host audio routing prevention is a best-effort workaround for Linux and may be undone by the host or phone firmware.",
-                                "If Android repeatedly rejects HID registration, use Retry once. The incompatible-device screen appears only after the registration attempt ceiling."
+                                stringResource(R.string.help_limits_1),
+                                stringResource(R.string.help_limits_2),
+                                stringResource(R.string.help_limits_3),
+                                stringResource(R.string.help_limits_4)
                             )
                         )
                         

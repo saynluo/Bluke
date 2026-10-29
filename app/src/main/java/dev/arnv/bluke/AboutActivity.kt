@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -74,10 +75,10 @@ class AboutActivity : ComponentActivity() {
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     topBar = {
                         LargeTopAppBar(
-                            title = { Text("About") },
+                            title = { Text(stringResource(R.string.about_title)) },
                             navigationIcon = {
                                 IconButton(onClick = { finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                 }
                             },
                             colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -110,15 +111,15 @@ class AboutActivity : ComponentActivity() {
                                     clickCount++
                                     if (clickCount == 5) {
                                         sharedPrefs.edit { putBoolean("is_developer_mode", true) }
-                                        android.widget.Toast.makeText(context, "You are now a developer!", android.widget.Toast.LENGTH_SHORT).show()
+                                        android.widget.Toast.makeText(context, context.getString(R.string.about_dev_enabled), android.widget.Toast.LENGTH_SHORT).show()
                                     } else if (clickCount > 5 && clickCount % 3 == 0) {
-                                        android.widget.Toast.makeText(context, "No need, you are already a developer.", android.widget.Toast.LENGTH_SHORT).show()
+                                        android.widget.Toast.makeText(context, context.getString(R.string.about_dev_already), android.widget.Toast.LENGTH_SHORT).show()
                                     }
                                 }
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_launcher_foreground),
-                                contentDescription = "App Logo",
+                                contentDescription = stringResource(R.string.cd_app_logo),
                                 modifier = Modifier.fillMaxSize(),
                                 tint = MaterialTheme.colorScheme.onPrimary
                             )
@@ -132,7 +133,7 @@ class AboutActivity : ComponentActivity() {
                         )
                         
                         Text(
-                            text = "Version $versionName",
+                            text = stringResource(R.string.about_version, versionName),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(bottom = 8.dp)
@@ -158,7 +159,7 @@ class AboutActivity : ComponentActivity() {
                                 ) {
                                     Icon(
                                         painter = painterResource(id = R.drawable.ic_github),
-                                        contentDescription = "GitHub Repository",
+                                        contentDescription = stringResource(R.string.cd_github_repo),
                                         modifier = Modifier.size(18.dp),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
@@ -188,13 +189,13 @@ class AboutActivity : ComponentActivity() {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Email,
-                                        contentDescription = "Contact Email",
+                                        contentDescription = stringResource(R.string.cd_contact_email),
                                         modifier = Modifier.size(18.dp),
                                         tint = MaterialTheme.colorScheme.onPrimaryContainer
                                     )
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "Email",
+                                        text = stringResource(R.string.about_email),
                                         fontWeight = FontWeight.Bold,
                                         style = MaterialTheme.typography.titleMedium,
                                         fontSize = 14.sp
@@ -204,7 +205,7 @@ class AboutActivity : ComponentActivity() {
                         }
 
                         // Developer Heading and Card content wrapped in SettingsGroup for visual consistency
-                        SettingsGroup(title = "Developer") {
+                        SettingsGroup(title = stringResource(R.string.about_developer)) {
                             Column(modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                      Surface(
@@ -220,7 +221,7 @@ class AboutActivity : ComponentActivity() {
                                          ) {
                                              Icon(
                                                  painter = painterResource(id = R.drawable.ic_wordmark),
-                                                 contentDescription = "Wordmark logo",
+                                                 contentDescription = stringResource(R.string.cd_wordmark),
                                                  tint = MaterialTheme.colorScheme.onPrimary,
                                                  modifier = Modifier.size(24.dp)
                                              )
@@ -282,29 +283,29 @@ class AboutActivity : ComponentActivity() {
                         }
 
                         SettingsCardGroup(
-                            title = "App",
+                            title = stringResource(R.string.about_app_section),
                             items = listOf(
                                 SettingsItemData(
-                                    title = "Changelogs",
-                                    subtitle = "History of all the changes made to the app",
+                                    title = stringResource(R.string.about_changelogs),
+                                    subtitle = stringResource(R.string.about_changelogs_sub),
                                     icon = { Icon(Icons.Default.History, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { openUrl("https://github.com/arnav-kr/Bluke/releases") }
                                 ),
                                 SettingsItemData(
-                                    title = "Licenses",
-                                    subtitle = "View the licenses that the app and libraries are using",
+                                    title = stringResource(R.string.licenses_title),
+                                    subtitle = stringResource(R.string.about_licenses_sub),
                                     icon = { Icon(Icons.Default.Policy, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { startActivity(Intent(this@AboutActivity, LicensesActivity::class.java)) }
                                 ),
                                 SettingsItemData(
-                                    title = "Report issue",
-                                    subtitle = "Report any issue or bug you have encountered while using the app",
+                                    title = stringResource(R.string.about_report_issue),
+                                    subtitle = stringResource(R.string.about_report_issue_sub),
                                     icon = { Icon(Icons.Default.BugReport, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { openUrl("https://github.com/arnav-kr/Bluke/issues/new?template=bug_report.md") }
                                 ),
                                 SettingsItemData(
-                                    title = "Feature request",
-                                    subtitle = "If you have any ideas or suggestions for the app, let us know",
+                                    title = stringResource(R.string.about_feature_request),
+                                    subtitle = stringResource(R.string.about_feature_request_sub),
                                     icon = { Icon(Icons.Default.Lightbulb, null, tint = MaterialTheme.colorScheme.primary) },
                                     onClick = { openUrl("https://github.com/arnav-kr/Bluke/issues/new?template=feature_request.md") }
                                 )

@@ -1,5 +1,7 @@
 package dev.arnv.bluke.ui
 
+import androidx.compose.ui.res.stringResource
+import dev.arnv.bluke.R
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,7 +48,7 @@ internal fun ReconnectHostButton(btManager: BluetoothKeyboardManager, iconOnly: 
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        Icon(Icons.Default.Refresh, "Reconnect to last host", tint = Color.White, modifier = Modifier.size(12.dp))
-        if (!iconOnly) Text("Reconnect", color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+        Icon(Icons.Default.Refresh, stringResource(R.string.cd_reconnect_last), tint = Color.White, modifier = Modifier.size(12.dp))
+        if (!iconOnly) Text(stringResource(R.string.action_reconnect), color = Color.White, fontSize = 9.sp, fontWeight = FontWeight.Bold)
     }
 }

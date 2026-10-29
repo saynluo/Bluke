@@ -1,5 +1,6 @@
 package dev.arnv.bluke
 
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -114,10 +115,10 @@ class LicensesActivity : ComponentActivity() {
                 Scaffold(
                     topBar = {
                         TopAppBar(
-                            title = { Text("Licenses") },
+                            title = { Text(stringResource(R.string.licenses_title)) },
                             navigationIcon = {
                                 IconButton(onClick = { finish() }) {
-                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
                                 }
                             }
                         )
@@ -164,7 +165,7 @@ class LicensesActivity : ComponentActivity() {
                                                 style = MaterialTheme.typography.titleLarge,
                                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                                             )
-                                            Text("This application", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
+                                            Text(stringResource(R.string.licenses_this_app), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f))
                                         }
                                     }
                                     
@@ -189,7 +190,7 @@ class LicensesActivity : ComponentActivity() {
                                     
                                     Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                                         Text(
-                                            text = "View on GitHub", 
+                                            text = stringResource(R.string.licenses_view_github), 
                                             color = MaterialTheme.colorScheme.primary, 
                                             fontWeight = FontWeight.SemiBold,
                                             modifier = Modifier.clickable {
@@ -197,7 +198,7 @@ class LicensesActivity : ComponentActivity() {
                                             }
                                         )
                                         Text(
-                                            text = "Full license text", 
+                                            text = stringResource(R.string.licenses_full_text), 
                                             color = MaterialTheme.colorScheme.primary, 
                                             fontWeight = FontWeight.SemiBold,
                                             modifier = Modifier.clickable {
@@ -210,13 +211,13 @@ class LicensesActivity : ComponentActivity() {
 
                             // Third-party libraries header
                             Column(modifier = Modifier.padding(horizontal = 16.dp)) {
-                                Text("Third-party libraries", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+                                Text(stringResource(R.string.licenses_third_party), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
-                                        text = "${filteredLibraries.size} libraries detected", 
+                                        text = stringResource(R.string.licenses_count, filteredLibraries.size), 
                                         style = MaterialTheme.typography.bodyMedium, 
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -230,15 +231,15 @@ class LicensesActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 16.dp),
-                                placeholder = { Text("Search libraries, authors, licenses...") },
+                                placeholder = { Text(stringResource(R.string.licenses_search)) },
                                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                                 shape = RoundedCornerShape(24.dp),
                                 singleLine = true,
                                 colors = OutlinedTextFieldDefaults.colors(
                                     unfocusedBorderColor = Color.Transparent,
                                     focusedBorderColor = Color.Transparent,
-                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh
                                 )
                             )
 
@@ -268,7 +269,7 @@ class LicensesActivity : ComponentActivity() {
                                             }
                                         },
                                         shape = shape,
-                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)),
+                                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Column(modifier = Modifier.padding(16.dp)) {
@@ -293,7 +294,7 @@ class LicensesActivity : ComponentActivity() {
                                                 }
                                                 Icon(
                                                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                                                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                                                    contentDescription = if (isExpanded) stringResource(R.string.cd_collapse) else stringResource(R.string.cd_expand),
                                                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                                                 )
                                             }
@@ -303,7 +304,7 @@ class LicensesActivity : ComponentActivity() {
                                                 HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.12f))
                                                 Spacer(modifier = Modifier.height(12.dp))
                                                 
-                                                Text(text = "ARTIFACT ID", style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                                                Text(text = stringResource(R.string.licenses_artifact_id), style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
                                                 Text(text = lib.artifactId, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
                                                 Spacer(modifier = Modifier.height(8.dp))
                                                 
@@ -322,7 +323,7 @@ class LicensesActivity : ComponentActivity() {
                                                     TextButton(onClick = {
                                                         context.startActivity(Intent(Intent.ACTION_VIEW, lib.githubUrl.toUri()))
                                                     }) {
-                                                        Text("View on GitHub")
+                                                        Text(stringResource(R.string.licenses_view_github))
                                                     }
                                                     Spacer(modifier = Modifier.width(8.dp))
                                                     TextButton(onClick = {
@@ -336,7 +337,7 @@ class LicensesActivity : ComponentActivity() {
                                                         }
                                                         context.startActivity(Intent(Intent.ACTION_VIEW, licenseUrl.toUri()))
                                                     }) {
-                                                        Text("Full license text")
+                                                        Text(stringResource(R.string.licenses_full_text))
                                                     }
                                                 }
                                             }

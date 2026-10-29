@@ -1,12 +1,15 @@
 package dev.arnv.bluke.ui
 
+import dev.arnv.bluke.R
+import androidx.annotation.StringRes
+
 const val HARDWARE_VOLUME_REMOTE_PREFERENCE = "media_hardware_volume_remote"
 const val TOUCHPAD_MODIFIER_POSITION_PREFERENCE = "touchpad_modifier_position"
 
-enum class TouchpadModifierPosition(val preferenceValue: String, val displayName: String) {
-    OFF("off", "Modifiers off"),
-    LEFT("left", "Modifiers left"),
-    RIGHT("right", "Modifiers right"),
+enum class TouchpadModifierPosition(val preferenceValue: String, @StringRes val labelRes: Int) {
+    OFF("off", R.string.modifiers_off),
+    LEFT("left", R.string.modifiers_left),
+    RIGHT("right", R.string.modifiers_right),
     ;
 
     fun next(): TouchpadModifierPosition = entries[(ordinal + 1) % entries.size]

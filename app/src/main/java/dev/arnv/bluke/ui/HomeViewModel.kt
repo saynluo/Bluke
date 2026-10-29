@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.stateIn
 
 data class HomeUiState(
     val bluetoothState: BluetoothState = BluetoothState.InitializingCapabilities,
-    val statusMessage: String = "Initializing Bluetooth Controller...",
+    val statusMessage: String = "",
     val bondedDevices: List<BluetoothDevice> = emptyList(),
     val scannedDevices: List<BluetoothDevice> = emptyList(),
     val isScanning: Boolean = false,
