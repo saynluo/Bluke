@@ -3,6 +3,19 @@
 All notable user-facing changes and improvements to Bluke are documented in this file.
 For detailed usage instructions, see the [Usage Guide](docs/USAGE.md).
 
+## [1.2.0] - 2026-10-28
+
+### Added
+- **LAN (Wi-Fi) Connection:** Connect without Bluetooth through a small Python receiver on the computer (`tools/bluke_lan_receiver.py`). Bluke discovers receivers on the local network, and you connect with the 6-digit PIN shown on the computer; the PIN is remembered per computer. Keyboard, touchpad and media keys are supported; gamepad remains Bluetooth-only. See the [Usage Guide](docs/USAGE.md#connecting-over-lan-wi-fi).
+- **Simplified Chinese:** Full Simplified Chinese interface that follows the system language, with Android 13+ per-app language support.
+
+### Improved & Fixed
+- **Redesigned Home Screen:** Bluetooth / LAN switcher, clearer status cards, and a "Connect over LAN instead" path when Bluetooth is off or unsupported.
+- **Refreshed Visual Design:** Without dynamic color, the whole palette now derives from the chosen accent; unified card surfaces, shapes, typography and tinted settings icons.
+- **Status Bar Contrast:** Settings screens no longer show white status-bar icons on light backgrounds.
+
+---
+
 ## [1.1.0] - 2026-10-09
 
 > [!IMPORTANT]

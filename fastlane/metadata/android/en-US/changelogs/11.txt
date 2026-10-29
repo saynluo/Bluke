@@ -1,0 +1,5 @@
+• New LAN (Wi-Fi) mode: the app finds computers running the Bluke receiver script and connects with a PIN
+• LAN works even when Bluetooth is off or unsupported
+• Redesigned home screen with a Bluetooth / LAN switcher
+• Colors now derive from your chosen accent; refreshed cards and settings
+• Simplified Chinese translation (follows the system language)

@@ -102,6 +102,8 @@ internal fun LazyListScope.LanSection(
         LanHidLink.State.Idle -> null
     }
     val others = hosts.filter { it.address != activeAddress }
+    // While connected, an empty "no computers found" card would contradict the header.
+    if (others.isEmpty() && activeAddress != null) return
     item {
         Column(modifier = Modifier.fillMaxWidth()) {
             SettingsSectionHeader(

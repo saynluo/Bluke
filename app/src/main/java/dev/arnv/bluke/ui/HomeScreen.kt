@@ -313,6 +313,12 @@ fun HomeScreen(
         mutableStateOf(ConnectionMode.fromPreference(sharedPrefs.getString(ConnectionMode.PREFERENCE, null)))
     }
     var pinDialogHost by remember { mutableStateOf<LanHidLink.Host?>(null) }
+    // Search as soon as the LAN view shows, including after an app restart in LAN mode.
+    LaunchedEffect(connectionMode) {
+        if (connectionMode == ConnectionMode.LAN && lanHosts.isEmpty() && lanState is LanHidLink.State.Idle) {
+            btManager.lanLink.scan()
+        }
+    }
     val offerSettingsPairingHelp = shouldOfferSettingsPairingHelp(btState, homeUiState.hidLifecycleState)
 
     LaunchedEffect(offerSettingsPairingHelp) {
@@ -1181,7 +1187,6 @@ fun HomeScreen(
                                 onSelect = { mode ->
                                     connectionMode = mode
                                     sharedPrefs.edit { putString(ConnectionMode.PREFERENCE, mode.preferenceValue) }
-                                    if (mode == ConnectionMode.LAN && lanHosts.isEmpty()) btManager.lanLink.scan()
                                 }
                             )
                         }
@@ -1210,7 +1215,6 @@ fun HomeScreen(
                                     onUseLan = {
                                         connectionMode = ConnectionMode.LAN
                                         sharedPrefs.edit { putString(ConnectionMode.PREFERENCE, ConnectionMode.LAN.preferenceValue) }
-                                        btManager.lanLink.scan()
                                     }
                                 )
                             }
